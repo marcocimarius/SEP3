@@ -13,6 +13,6 @@ message TestResponse{
 }
 
 service TestService {
-  rpc hello(TestRequest) returns (HelloResponse);
+  rpc hello(TestRequest) returns (TestResponse);
 }
 

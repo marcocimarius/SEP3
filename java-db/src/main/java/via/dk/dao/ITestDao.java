@@ -1,6 +1,6 @@
-package dao;
+package via.dk.dao;
 
-import model.ITest;
+import via.dk.model.ITest;
 
 import java.sql.SQLException;
 import java.util.List;

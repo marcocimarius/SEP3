@@ -1,7 +1,8 @@
-package dao;
+package via.dk.dao;
 
-import model.ITest;
-import util.DatabaseConnection;
+import via.dk.model.ITest;
+import via.dk.model.Test;
+import via.dk.util.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
