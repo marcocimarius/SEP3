@@ -6,8 +6,8 @@ public class Test implements ITest{
 	private String description;
 	public Test() {
 	}
-	public Test(Integer id, String name, String description) {
-		this.id = id;
+	public Test(String name, String description) {
+		this.id = null;
 		this.name = name;
 		this.description = description;
 	}
