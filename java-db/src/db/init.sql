@@ -1,3 +1,12 @@
+DROP TABLE IF EXISTS test;
+CREATE TABLE test
+(
+    id serial PRIMARY KEY,
+    name VARCHAR,
+    description VARCHAR
+);
+
+select * from test;
 drop table test;
 
 create table country(
@@ -73,7 +82,8 @@ create table recipe (
     contains_allergen bool default false,
     calories int default 0,
     creation_date date DEFAULT CURRENT_DATE,
-    modification_date date null
+    modification_date date null,
+    image_link varchar(100)
 );
 
 create table ingredient (
