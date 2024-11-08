@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException	 {
 		Server server = ServerBuilder.forPort(8181)
-				.addService(new TestServiceImpl())
+				.addService(new RegistrationServiceImpl())
 				.build();
 
 		server.start();

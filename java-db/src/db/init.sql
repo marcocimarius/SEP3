@@ -6,9 +6,6 @@ CREATE TABLE test
     description VARCHAR
 );
 
-select * from test;
-drop table test;
-
 create table country(
     id serial primary key,
     name varchar(100)
