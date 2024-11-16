@@ -1,22 +1,24 @@
 <div class="rounded overflow-hidden shadow-lg">
     <img class="w-full" src="@ImageUrl" alt="Sunset in the mountains">
     <div class="px-6 py-4">
-        <div class="font-bold text-xl mb-2">@Title</div>
-        <div class="flex gap-2">
-            @foreach (string type in Types)
-            {
-                <span
-                    class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">@type</span>
-            }
-        </div>
-        <p class="text-gray-700 text-base">@Description</p>
-        <ul class="list-disc list-inside">
+        <div class="font-bold text-xl mb-3">@Title</div>
+        <ul class="flex gap-2 mb-2 font-semibold">
             @foreach (string ing in Ingredients)
             {
+                <span class="first-of-type:hidden">•</span>
                 <li
                     class="">@ing</li>
             }
         </ul>
+        <hr class="border-gray-200 mb-3" />
+        <p class="text-gray-700 text-base mb-3">@Description</p>
+        <div class="flex gap-2 mb-3 flex-wrap">
+            @foreach (string type in Types)
+            {
+                <span
+                    class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">@type</span>
+            }
+        </div>
         @if(Editable){
             <div class="flex justify-end gap-2 w-full">
                 <button class="bg-yellow-500 font-normal text-sm hover:bg-yellow-600 text-white py-2 px-4 rounded">Edit</button>
