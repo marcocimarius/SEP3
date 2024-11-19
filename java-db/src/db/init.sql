@@ -386,3 +386,5 @@ drop table registration;
 drop table address;
 drop table city;
 drop table country;
+
+select * from registration;
