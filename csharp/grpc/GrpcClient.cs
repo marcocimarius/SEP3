@@ -5,15 +5,22 @@ namespace grpc;
 
 public class GrpcClient
 {
-    private readonly TestService.TestServiceClient _client;
+    private readonly RegistrationService.RegistrationServiceClient _client;
     public GrpcClient()
     {
         var channel = GrpcChannel.ForAddress("http://localhost:8181");
-        this._client = new TestService.TestServiceClient(channel);
+        this._client = new RegistrationService.RegistrationServiceClient(channel);
     }
-    public async Task<String> AddTest(TestRequest req)
+    
+    public async Task<string> CreateRegistration(String email, String password, bool isAdmin)
     {
-        var reply = await this._client.helloAsync(req);
-        return reply.Greeting; 
+        var request = new CreateRegistrationRequest()
+        {
+            Email = email,
+            Password = password,
+            IsAdmin = isAdmin
+        };
+        var response = await this._client.CreateRegistrationAsync(request);
+        return response.Status;     
     }
 }

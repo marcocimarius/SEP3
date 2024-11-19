@@ -1,0 +1,18 @@
+syntax = "proto3";
+option java_multiple_files = true;
+
+package via.dk;
+
+message CreateRegistrationRequest{
+    string email = 1;
+    string password = 2;
+    bool isAdmin = 3;
+}
+
+message CreateRegistrationResponse{
+    string status = 1;
+}
+
+service RegistrationService {
+    rpc CreateRegistration(CreateRegistrationRequest) returns (CreateRegistrationResponse);
+}

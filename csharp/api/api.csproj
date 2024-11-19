@@ -10,4 +10,10 @@
       <ProjectReference Include="..\grpc\grpc.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.0.0" />
+    </ItemGroup>
+
 </Project>

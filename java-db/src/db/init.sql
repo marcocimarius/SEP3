@@ -6,9 +6,6 @@ CREATE TABLE test
     description VARCHAR
 );
 
-select * from test;
-drop table test;
-
 create table country(
     id serial primary key,
     name varchar(100)
@@ -389,3 +386,5 @@ drop table registration;
 drop table address;
 drop table city;
 drop table country;
+
+select * from registration;

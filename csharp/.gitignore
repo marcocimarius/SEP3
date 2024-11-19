@@ -1,5 +1,7 @@
 bin/
 obj/
+node_modules/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+app.min.css

@@ -4,40 +4,51 @@
 
 <PageTitle>Test</PageTitle>
 
-<h1 class="font-bold text-3xl">Test a request</h1>
-<div class="flex-col justify-start items-start">
-    <div>
-        <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
-        <input type="text" @bind="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="John" required />
+<div class="max-w-screen-xl mx-auto">
+    <h1 class="font-bold text-3xl">Test a request</h1>
+    <div class="flex-col max-w-screen-xl justify-start items-start">
+        <div>
+            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+            <input type="text" @bind="email" id="email"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                   placeholder="John" required/>
+        </div>
+        <div>
+            <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
+            <input type="password" @bind="password" id="password"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                   placeholder="John" required/>
+        </div>
+        <div class="py-2">
+            <button @onclick="FetchData"
+                    class="bg-indigo-600 font-normal text-sm hover:bg-indigo-700 text-white py-2 px-4 rounded">
+                Submit
+            </button>
+        </div>
     </div>
-    <div>
-        <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Description</label>
-        <input type="text" @bind="description" id="description" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="John" required />
-    </div>
-    <div class="py-2">
-        <button @onclick="FetchData" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Submit
-        </button>
-    </div>
+    @if (response != null)
+    {
+        <p>
+            Response: @response.;
+        </p>
+    }
 </div>
-@if (response != null)
-{
-    <p>
-        Response: @response.;
-    </p>
-}
 
 @code {
-    private string? name { get; set; }
-    private string? description { get; set; }
-    private string? response;
+    private string? email { get; set; }
+    private string? password { get; set; }
+    private string? response { get; set; }
 
     private async Task FetchData()
     {
-        TestRequest request = new TestRequest();
-        request.Name = name;
-        request.Description = description;
-        var temp = await Http.PostAsJsonAsync("api/test", request);
+        CreateRegistrationRequest request = new CreateRegistrationRequest
+        {
+            Email = email,
+            Password = password,
+            IsAdmin = false
+        };
+        var temp = await Http.PostAsJsonAsync("api/registration", request);
         response = await temp.Content.ReadAsStringAsync();
     }
+
 }
