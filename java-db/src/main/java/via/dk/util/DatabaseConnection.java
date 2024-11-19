@@ -8,8 +8,9 @@ public class DatabaseConnection {
 
 	private static Connection con = null;
 	// change based on your database
-	private static final String url = "jdbc:postgresql://localhost:5432/goodbyerotten";
-	private static final String user = "dimitar.nizamov";
+	private static final String url = "jdbc:postgresql://localhost:5432/goodbyerotten"; //dimitar, marius
+	//private static final String user = "dimitar.nizamov"; //dimitar
+	private static final String user = "postgres"; //marius
 	private static final String password = "";
 
 	static
