@@ -9,7 +9,7 @@ import via.dk.RegistrationServiceGrpc;
 import via.dk.dao.IRegistrationDao;
 
 public class RegistrationServiceImpl extends RegistrationServiceGrpc.RegistrationServiceImplBase {
-	IRegistrationDao registrationDao;
+	private final IRegistrationDao registrationDao;
 
 	public RegistrationServiceImpl() {
 		registrationDao = new RegistrationDaoImpl();
