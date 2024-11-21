@@ -1,5 +1,7 @@
 package via.dk.model.recipe;
 
+import java.sql.Timestamp;
+
 public class Recipe
 {
   private Integer id;
@@ -7,12 +9,12 @@ public class Recipe
   private String type;
   private boolean containsAllergen;
   private int calories;
-  private String creationDate;
-  private String modificationDate;
+  private Timestamp creationDate;
+  private Timestamp modificationDate;
   private String imageLink;
 
   public Recipe(int id, String name, String type, boolean containsAllergen,
-      int calories, String creationDate, String modificationDate, String imageLink)
+      int calories, Timestamp creationDate, Timestamp modificationDate, String imageLink)
   {
     this.id = id;
     this.name = name;
@@ -84,22 +86,22 @@ public class Recipe
     this.calories = calories;
   }
 
-  public String getCreationDate()
+  public Timestamp getCreationDate()
   {
     return creationDate;
   }
 
-  public void setCreationDate(String creationDate)
+  public void setCreationDate(Timestamp creationDate)
   {
     this.creationDate = creationDate;
   }
 
-  public String getModificationDate()
+  public Timestamp getModificationDate()
   {
     return modificationDate;
   }
 
-  public void setModificationDate(String modificationDate)
+  public void setModificationDate(Timestamp modificationDate)
   {
     this.modificationDate = modificationDate;
   }
