@@ -10,6 +10,7 @@ public class Main {
 		Server server = ServerBuilder.forPort(8181)
 				.addService(new RegistrationServiceImpl())
 				.addService(new RecipeServiceImpl())
+				.addService(new IngredientServiceImp())
 				.build();
 
 		server.start();

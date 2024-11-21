@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RecipeDaoImpl implements IRecipeDao
 {
-  Connection db = DatabaseConnection.getConnection();
+  private final Connection db = DatabaseConnection.getConnection();
 
   @Override public int create(Recipe recipe) throws SQLException
   {
@@ -27,7 +27,7 @@ public class RecipeDaoImpl implements IRecipeDao
     while (resultSet.next()) {
       recipes.add(new Recipe(resultSet.getInt("id"), resultSet.getString("name"),
           resultSet.getString("type"), resultSet.getBoolean("contains_allergen"), resultSet.getInt("calories"),
-          resultSet.getString("creation_date"), resultSet.getString("modification_date"), resultSet.getString("image_link")));
+          resultSet.getTimestamp("creation_date"), resultSet.getTimestamp("modification_date"), resultSet.getString("image_link")));
     }
     return recipes;
   }
