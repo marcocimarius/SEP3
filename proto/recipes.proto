@@ -1,0 +1,42 @@
+﻿syntax = "proto3";
+option java_multiple_files = true;
+
+package via.dk;
+
+message Recipe {
+  int32 id = 1;
+  string name = 2;
+  string type = 3;
+  bool contains_allergen = 4;
+  int32 calories = 5;
+  string creation_date = 6;
+  string modification_date = 7;
+  string image_link = 8;
+}
+
+
+message CreateRecipeRequest {
+  string name = 1;
+  string type = 2;
+  bool contains_allergen = 3;
+  int32 calories = 4;
+  string image_link = 5;
+}
+
+message CreateRecipeResponse {
+  string status = 1;
+}
+
+message RetrieveRecipeRequest {
+  //this probably has to remain empty
+}
+
+message RetrieveRecipeResponse {
+  repeated Recipe recipes = 1;
+}
+
+//create is absolute bullshit, needs more work
+service RecipeService {
+  rpc CreateRecipe(CreateRecipeRequest) returns (CreateRecipeResponse);
+  rpc GetAllRecipes(RetrieveRecipeRequest) returns (RetrieveRecipeResponse);
+}

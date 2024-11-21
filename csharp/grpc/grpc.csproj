@@ -16,6 +16,12 @@
     </ItemGroup>
     <ItemGroup>
         <Protobuf Include="..\..\proto\registration.proto" GrpcServices="Client" />
+        <Protobuf Include="..\..\proto\recipes.proto" GrpcServices="Client" />
     </ItemGroup>
+<!--    <ItemGroup>-->
+<!--      <Content Include="..\..\proto\recipes.proto">-->
+<!--        <Link>proto\recipes.proto</Link>-->
+<!--      </Content>-->
+<!--    </ItemGroup>-->
 
 </Project>
