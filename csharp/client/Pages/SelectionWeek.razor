@@ -1,0 +1,67 @@
+﻿@page "/SelectionWeek"
+@using System.Globalization
+@using BlazorApp1.Components
+<h3 class="font-bold text-3xl space-x-4">Choose your recipes for the week</h3>
+<div class="flex flex-row space-y-8">
+    <form>
+        <label for="years" class="block mb-2 text-sm font-medium text-gray-900 " >Year</label>
+        <select id="years" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" style="width:190px; height: 40px;">
+            <option selected>Choose a year</option>
+            <option>2024</option>
+            <option>2023</option>
+            <option>2022</option>
+            <option>2025</option>
+        </select>
+    </form>
+    <form>
+        <label for="week" class="block mb-2 text-sm font-medium text-gray-900 " >Week</label>
+        <select id="week" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" style="width: 230px; height: 40px;">
+            <option selected>Choose a week number</option>
+            @for(int n = 1; n<=52; n++)
+            {
+                <option>@n</option>
+            }
+        </select>
+    </form>
+</div>
+<div>
+    <label class="font-bold text-xl">Current Time: Year @current.Year Week @weekNumber - @startOfWeekDate.ToShortDateString() - @endOfWeekDate.ToShortDateString() </label>
+</div>
+<div class="flex gap-4">
+    <RecipeCard
+        ImageUrl="assets/spaghetti-bolog.jpg"
+        Title="Spaghetti bolognese"
+        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+        Types="types"
+        Ingredients="ingredients"/>
+    <RecipeCard
+        ImageUrl="assets/spaghetti-bolog.jpg"
+        Title="Spaghetti bolognese"
+        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+        Types="types"
+        Ingredients="ingredients"/>
+    <RecipeCard
+        ImageUrl="assets/spaghetti-bolog.jpg"
+        Title="Spaghetti bolognese"
+        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+        Types="types"
+        Ingredients="ingredients"/>
+</div>
+
+@code {
+    private int week;
+    private int year= 0;
+    private static DateTime current = DateTime.Now;
+    private static DayOfWeek startOfWeek = DayOfWeek.Monday;
+
+    private static int diffToStart = (7 + (current.DayOfWeek - startOfWeek)) % 7;
+    private static DateTime startOfWeekDate = current.AddDays(-diffToStart).Date;
+    private static DateTime endOfWeekDate = startOfWeekDate.AddDays(6).Date;
+
+    static CultureInfo culture = CultureInfo.CurrentCulture;
+    private static Calendar calendar = culture.Calendar;
+    private static CalendarWeekRule weekRule = CalendarWeekRule.FirstFourDayWeek;
+    private int weekNumber = calendar.GetWeekOfYear(current, weekRule, startOfWeek);
+    List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
+    List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
+}
