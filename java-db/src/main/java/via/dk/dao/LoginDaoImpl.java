@@ -20,9 +20,10 @@ public class LoginDaoImpl implements ILoginDao {
 		stmt.setString(1, login.getEmail());
 		ResultSet result = stmt.executeQuery();
 		while (result.next()) {
-			return new Registration(result.getString("username"),
+			return new Registration(result.getInt("id"),
+					result.getString("username"),
 					result.getString("password"),
-					result.getBoolean("isAdmin"));
+					result.getBoolean("is_admin"));
 		}
 		return null;
 	}

@@ -19,9 +19,10 @@ message LoginRequest{
 }
 
 message LoginResponse{
-  string email = 1;
-  string password = 2;
-  bool isAdmin = 3;
+  int32 id = 1;
+  string email = 2;
+  string password = 3;
+  bool isAdmin = 4;
 }
 
 service RegistrationService {

@@ -16,6 +16,17 @@ public class Registration implements IRegistration {
 		this.isAdmin = isAdmin;
 	}
 
+	public Registration(Integer id, String email, String password, Boolean isAdmin) {
+		this.id = id;
+		this.email = email;
+		this.password = password;
+		this.isAdmin = isAdmin;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
 	@Override
 	public String getEmail() {
 		return this.email;

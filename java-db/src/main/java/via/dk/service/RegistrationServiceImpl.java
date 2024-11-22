@@ -37,7 +37,7 @@ public class RegistrationServiceImpl extends RegistrationServiceGrpc.Registratio
 	@Override
 	public void login(LoginRequest request, StreamObserver<LoginResponse> responseObserver) {
 		Login login = new Login(request.getEmail(), request.getPassword());
-		Registration reg;
+		Registration reg = null;
 		try {
 			 reg = loginDao.login(login);
 		} catch (Exception e) {
@@ -45,8 +45,10 @@ public class RegistrationServiceImpl extends RegistrationServiceGrpc.Registratio
 		}
 		if(reg == null) {
 			responseObserver.onError(new Exception("User does not exist"));
+			return;
 		}
 		LoginResponse response = LoginResponse.newBuilder()
+				.setId(reg.getId())
 				.setEmail(reg.getEmail())
 				.setPassword(reg.getPassword())
 				.setIsAdmin(reg.getIsAdmin())

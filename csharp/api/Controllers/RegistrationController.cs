@@ -1,3 +1,4 @@
+using api.Responses;
 using api.services;
 using grpc;
 namespace api.Controllers;
@@ -18,12 +19,18 @@ public class RegistrationController(GrpcClient grpcService) : ControllerBase
     
     [HttpPost]
     [Route("login")]
-    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest req)
+    public async Task<ActionResult<ApiLoginResponse>> Login([FromBody] LoginRequest req)
     {
         LoginResponse? res = await grpcService.Login(req.Email, req.Password);
-        if (res == null) return Unauthorized();
+        if (res == null) return NotFound();
+        ApiLoginResponse apiRes = new ApiLoginResponse
+        {
+            Id = res.Id,
+            IsAdmin = res.IsAdmin,
+            Email = res.Email
+        };
         bool logged = PasswordService.Verify(req.Password, res.Password);
         if (!logged) return Unauthorized();
-        return res;
+        return apiRes;
     }
 }

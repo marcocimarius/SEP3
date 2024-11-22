@@ -39,7 +39,15 @@ public class GrpcClient
             Email = email,
             Password = password,
         };
-        var response = await this._client.LoginAsync(request);
+        LoginResponse? response = null;
+        try
+        {
+            response = await this._client.LoginAsync(request);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
         return response;
     }
 }
