@@ -1,0 +1,56 @@
+syntax = "proto3";
+option java_multiple_files = true;
+import "google/protobuf/timestamp.proto";
+
+package via.dk;
+
+message Ingredient {
+  int32 id = 1;
+  string name = 2;
+  int32 calories = 3;
+  bool is_allergen = 4;
+  google.protobuf.Timestamp creation_date = 5;
+  google.protobuf.Timestamp modification_date = 6;
+}
+
+message UpdateIngredientRequest {
+  int32 id = 1;
+  string name = 2;
+  int32 calories = 3;
+  bool is_allergen = 4;
+}
+
+message UpdateIngredientResponse {
+  string status = 1;
+}
+
+message CreateIngredientRequest {
+  string name = 1;
+  int32 calories = 2;
+  bool contains_allergens = 3;
+}
+
+message CreateIngredientResponse {
+  string status = 1;
+}
+
+message DeleteIngredientRequest {
+  int32 id = 1;
+}
+
+message DeleteIngredientResponse {
+  string status = 1;
+}
+
+message GetAllIngredientsRequest {}
+
+message GetAllIngredientsResponse {
+  repeated Ingredient ingredients = 1;
+}
+
+service IngredientsService {
+  rpc CreateIngredient(CreateIngredientRequest) returns (CreateIngredientResponse);
+  rpc UpdateIngredient(UpdateIngredientRequest) returns (UpdateIngredientResponse);
+  rpc DeleteIngredient(DeleteIngredientRequest) returns (DeleteIngredientResponse);
+  rpc GetAllIngredients(GetAllIngredientsRequest) returns (GetAllIngredientsResponse);
+}
