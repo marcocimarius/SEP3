@@ -1,6 +1,6 @@
 package via.dk.dao;
 
-import via.dk.model.IRegistration;
+import via.dk.model.auth.IRegistration;
 
 import java.sql.SQLException;
 

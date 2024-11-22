@@ -1,4 +1,4 @@
-package via.dk.model;
+package via.dk.model.auth;
 
 public class Registration implements IRegistration {
 	private Integer id;
