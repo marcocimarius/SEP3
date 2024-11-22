@@ -10,9 +10,10 @@ public class IngredientModel
   private boolean isAllergen;
   private Timestamp creationDate;
   private Timestamp modificationDate;
+  private String type;
 
   public IngredientModel(Integer id, String name, int calories, boolean isAllergen,
-      Timestamp creationDate, Timestamp modificationDate)
+      Timestamp creationDate, Timestamp modificationDate, String type)
   {
     this.id = id;
     this.name = name;
@@ -20,6 +21,7 @@ public class IngredientModel
     this.isAllergen = isAllergen;
     this.creationDate = creationDate;
     this.modificationDate = modificationDate;
+    this.type = type;
   }
 
   public Integer getId()
@@ -80,5 +82,15 @@ public class IngredientModel
   public void setModificationDate(Timestamp modificationDate)
   {
     this.modificationDate = modificationDate;
+  }
+
+  public String getType()
+  {
+    return type;
+  }
+
+  public void setType(String type)
+  {
+    this.type = type;
   }
 }
