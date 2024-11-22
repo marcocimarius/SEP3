@@ -8,32 +8,66 @@
                     <p class="font-bold text-xl leading-none">ROTTEN</p>
                 </div>
             </NavLink>
-            <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
-                <li>
-                    <NavLink class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
-                             href="" Match="NavLinkMatch.All">
-                        Home
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
-                             href="test" Match="NavLinkMatch.All">
-                        Register
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
-                             href="test" Match="NavLinkMatch.All">
-                        Ingredients
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
-                             href="recipes" Match="NavLinkMatch.All">
-                        Recipes
-                    </NavLink>
-                </li>
-            </ul>
+            <AuthorizeView>
+
+                <Authorized>
+                    <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
+                        <li>
+                            <NavLink
+                                class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
+                                href="" Match="NavLinkMatch.All">
+                                Home
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
+                                href="test" Match="NavLinkMatch.All">
+                                Register
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
+                                href="test" Match="NavLinkMatch.All">
+                                Ingredients
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
+                                href="recipes" Match="NavLinkMatch.All">
+                                Recipes
+                            </NavLink>
+                        </li>
+                    </ul>
+                </Authorized>
+                <NotAuthorized>
+                    <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
+                        <li>
+                            <NavLink
+                                class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
+                                href="" Match="NavLinkMatch.All">
+                                Home
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
+                                href="register" Match="NavLinkMatch.All">
+                                Register
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                class="block py-2 px-3 text-indigo-700 bg-indigo-700 rounded md:bg-transparent md:p-0"
+                                href="login" Match="NavLinkMatch.All">
+                                Login
+                            </NavLink>
+                        </li>
+                    </ul>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </div>
 </nav>
