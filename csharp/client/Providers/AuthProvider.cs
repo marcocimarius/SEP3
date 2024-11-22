@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using Via.Dk;
 
 namespace BlazorApp1.Providers;
@@ -10,13 +11,15 @@ public class AuthProvider : AuthenticationStateProvider
 {
     private readonly HttpClient httpClient;
     private ClaimsPrincipal currentClaimsPrincipal;
-    
-    public AuthProvider(HttpClient httpClient)
+    private readonly IJSRuntime jsRuntime;
+
+    public AuthProvider(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         this.httpClient = httpClient;
+        this.jsRuntime = jsRuntime;
     }
 
-    
+
     public async Task Login(string username, string password)
     {
         LoginRequest loginRequest = new LoginRequest
@@ -36,6 +39,9 @@ public class AuthProvider : AuthenticationStateProvider
         {
             PropertyNameCaseInsensitive = true
         });
+        var serializedData = JsonSerializer.Serialize(loginResponse);
+        await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser", serializedData);
+
         List<Claim> claims = new List<Claim>
         {
             new Claim("Id", loginResponse.Id.ToString()),
@@ -51,12 +57,37 @@ public class AuthProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        return new AuthenticationState(currentClaimsPrincipal ?? new());
+        string userAsJson = "";
+        try
+        {
+            userAsJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "currentUser");
+        }
+        catch (InvalidOperationException e)
+        {
+            return new AuthenticationState(new());
+        }
+
+        if (string.IsNullOrEmpty(userAsJson))
+        {
+            return new AuthenticationState(new());
+        }
+
+        LoginResponse loginResponse = JsonSerializer.Deserialize<LoginResponse>(userAsJson)!;
+        List<Claim> claims = new List<Claim>()
+        {
+            new Claim("Id", loginResponse.Id.ToString()),
+            new Claim("Email", loginResponse.Email),
+            new Claim("Role", loginResponse.IsAdmin ? "Admin" : "User")
+        };
+        ClaimsIdentity identity = new ClaimsIdentity(claims, "apiauth");
+        ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
+        return new AuthenticationState(claimsPrincipal);
     }
 
     public async Task Logout()
     {
         currentClaimsPrincipal = new();
+        await jsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "currentUser");
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(currentClaimsPrincipal)));
     }
 }
