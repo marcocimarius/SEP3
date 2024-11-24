@@ -12,7 +12,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: localPolicy,
         policy =>
         {
-            policy.WithOrigins("http://localhost:7153").AllowAnyHeader().AllowAnyMethod();
+            policy.WithOrigins("http://localhost:5206").AllowAnyHeader().AllowAnyMethod();
         });
 });
 builder.Services.AddSwaggerGen(c =>

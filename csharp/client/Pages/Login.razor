@@ -1,0 +1,56 @@
+@page "/login"
+@using BlazorApp1.Providers
+@inject AuthenticationStateProvider authProvider;
+@inject NavigationManager navMgr;
+
+<div class="max-w-screen-xl mx-auto">
+    <h1 class="font-bold text-3xl pt-4 pb-3">Login</h1>
+    <div class="flex-col max-w-screen-xl justify-start items-start">
+        <div class="flex flex-col">
+            <div>
+                <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Username *</label>
+                <input type="email" @bind="email" id="email"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
+                />
+            </div>
+            <div>
+                <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password *</label>
+                <input type="password" @bind="password" id="password"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
+                />
+            </div>
+        </div>
+        <div class="py-2 flex justify-end items-center">
+            <p style="color: gray; margin-right: auto; font-size: small">* required fields</p>
+            @if (!String.IsNullOrEmpty(error))
+            {
+                <p style="color: red; margin-right: 15px">Failed to login @error</p>
+            }
+            <button @onclick="LoginAsync"
+                    class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
+                Login
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string email;
+    private string password;
+    private string error;
+
+    private async Task LoginAsync()
+    {
+        error = "";
+        try
+        {
+            await ((AuthProvider)authProvider).Login(email, password);
+            navMgr.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+}

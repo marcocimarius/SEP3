@@ -31,4 +31,23 @@ public class GrpcClient
         var response = await this._client.CreateRegistrationAsync(request);
         return response.Status;     
     }
+
+    public async Task<LoginResponse?> Login(String email, String password)
+    {
+        var request = new LoginRequest()
+        {
+            Email = email,
+            Password = password,
+        };
+        LoginResponse? response = null;
+        try
+        {
+            response = await this._client.LoginAsync(request);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        return response;
+    }
 }

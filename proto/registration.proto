@@ -13,6 +13,19 @@ message CreateRegistrationResponse{
     string status = 1;
 }
 
+message LoginRequest{
+    string email = 1;
+    string password = 2;
+}
+
+message LoginResponse{
+  int32 id = 1;
+  string email = 2;
+  string password = 3;
+  bool isAdmin = 4;
+}
+
 service RegistrationService {
     rpc CreateRegistration(CreateRegistrationRequest) returns (CreateRegistrationResponse);
+    rpc Login(LoginRequest) returns (LoginResponse);
 }

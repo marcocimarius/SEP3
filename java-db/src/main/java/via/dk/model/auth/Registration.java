@@ -1,4 +1,4 @@
-package via.dk.model;
+package via.dk.model.auth;
 
 public class Registration implements IRegistration {
 	private Integer id;
@@ -14,6 +14,17 @@ public class Registration implements IRegistration {
 		this.email = email;
 		this.password = password;
 		this.isAdmin = isAdmin;
+	}
+
+	public Registration(Integer id, String email, String password, Boolean isAdmin) {
+		this.id = id;
+		this.email = email;
+		this.password = password;
+		this.isAdmin = isAdmin;
+	}
+
+	public Integer getId() {
+		return id;
 	}
 
 	@Override
