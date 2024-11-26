@@ -2,32 +2,111 @@
 @using BlazorApp1.Components
 
 <pagetitle class="text-2xl font-bold">Recipes</pagetitle>
+<div class="flex gap-4 items-end pb-3">
+    <div class="relative w-1/5">
+        <label for="search" class="block mb-2 text-sm font-medium text-gray-900">Search</label>
+        <input type="text" id="search" @bind="SearchText"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 pr-10"
+               placeholder="Search recipes..." />
+        <button @onclick="PerformSearch"
+                class="absolute inset-y-0 right-0 rounded-r items-center pt-6 pr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="20px" height="20px"><path d="M 13 3 C 7.4889971 3 3 7.4889971 3 13 C 3 18.511003 7.4889971 23 13 23 C 15.396508 23 17.597385 22.148986 19.322266 20.736328 L 25.292969 26.707031 A 1.0001 1.0001 0 1 0 26.707031 25.292969 L 20.736328 19.322266 C 22.148986 17.597385 23 15.396508 23 13 C 23 7.4889971 18.511003 3 13 3 z M 13 5 C 17.430123 5 21 8.5698774 21 13 C 21 17.430123 17.430123 21 13 21 C 8.5698774 21 5 17.430123 5 13 C 5 8.5698774 8.5698774 5 13 5 z"/></svg>
+        </button>
+    </div>
+    <div class="w-1/5">
+        <label for="type" class="block mb-2 text-sm font-medium text-gray-900">Type</label>
+        <select id="type" @bind="SelectedType"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+            <option value="">Select type</option>
+            @foreach (var type in Types)
+            {
+            <option value="@type">@type</option>
+            }
+        </select>
+    </div>
+    <div class="w-1/5">
+        <label for="allergen" class="block mb-2 text-sm font-medium text-gray-900">Allergen</label>
+        <select id="allergen" @bind="SelectedAllergen"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+            <option value="">Select allergen</option>
+            @foreach (var allergen in Allergens)
+            {
+                <option value="@allergen">@allergen</option>
+            }
+        </select>
+    </div>
+    <div class="flex-grow"></div>
+    <div class="flex space-x-4 items-end">
+        <button @onclick="ShowNewIngredientPopup"
+                class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
+            New Ingredient
+        </button>
+        <button @onclick="ShowNewRecipePopup"
+                class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
+            New Recipe
+        </button>
+    </div>
+</div>
+
 <div class="flex gap-4">
-    <RecipeCard
-        ImageUrl="assets/spaghetti-bolog.jpg"
-        Title="Spaghetti bolognese"
-        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-        Types="types"
-        Ingredients="ingredients"
-        Editable="true"
-    />
-    <RecipeCard
-        ImageUrl="assets/spaghetti-bolog.jpg"
-        Title="Spaghetti bolognese"
-        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-        Types="types"
-        Ingredients="ingredients"
-    />
-    <RecipeCard
-        ImageUrl="assets/spaghetti-bolog.jpg"
-        Title="Spaghetti bolognese"
-        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-        Types="types"
-        Ingredients="ingredients"
-    />
+    @foreach (var recipe in FilteredRecipes)
+    {
+        <RecipeCard
+            ImageUrl="assets/spaghetti-bolog.jpg"
+            Title="@recipe.Title"
+            Description="@recipe.Description"
+            Types="@recipe.Types"
+            Ingredients="@recipe.Ingredients"
+            Allergens="@recipe.Allergens"
+            Editable="true"
+        />
+    }
 </div>
 
 @code {
-    List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
-    List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
+    private string SearchText { get; set; } = string.Empty;
+    private string SelectedType { get; set; } = string.Empty;
+    private string SelectedAllergen { get; set; } = string.Empty;
+    
+    List<string> Types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
+    List<string> Ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
+    List<string> Allergens = new List<string> { "Gluten", "Peanuts", "Dairy", "Soy" };
+
+    private List<RecipeModel> Recipes = new List<RecipeModel>
+    {
+        new RecipeModel { Title = "Spaghetti bolognese", Description = "Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway.", Types = new List<string> { "Meateatrian" }, Ingredients = new List<string> { "Pasta", "Minced Meat" }, Allergens = new List<string> {"Gluten"} },
+        new RecipeModel { Title = "Spaghetti carbonara", Description = "Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway.", Types = new List<string> { "Meateatrian" }, Ingredients = new List<string> { "Pasta", "Parmezan" }, Allergens = new List<string> {"Dairy"} },
+        new RecipeModel { Title = "Spaghetti bla bla bla", Description = "Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway.", Types = new List<string> { "Vegetarian" }, Ingredients = new List<string> { "Pasta", "Tomato" }, Allergens = new List<string> {"Peanuts"} },
+    };
+
+    
+    private List<RecipeModel> FilteredRecipes => Recipes
+        .Where(r => (string.IsNullOrEmpty(SearchText) || r.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || r.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || r.Types.Any(t => t.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) || r.Ingredients.Any(i => i.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
+                    && (string.IsNullOrEmpty(SelectedType) || r.Types.Contains(SelectedType))
+                    && (string.IsNullOrEmpty(SelectedAllergen) || !r.Allergens.Contains(SelectedAllergen)))
+        .ToList();
+
+    private void ShowNewIngredientPopup()
+    {
+        
+    }
+
+    private void ShowNewRecipePopup()
+    {
+
+    }
+
+    private void PerformSearch()
+    {
+        StateHasChanged();
+    }
+
+    private class RecipeModel
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public List<string> Types { get; set; }
+        public List<string> Ingredients { get; set; }
+        public List<string> Allergens { get; set; }
+    }
 }
