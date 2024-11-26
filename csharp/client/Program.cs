@@ -14,5 +14,5 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://
 builder.Services.AddScoped<AuthenticationStateProvider, AuthProvider>();
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddSingleton<ButtonStateService>();
+builder.Services.AddSingleton<RecipeInformationService>();
 await builder.Build().RunAsync();
