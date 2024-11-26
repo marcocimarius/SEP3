@@ -1,14 +1,16 @@
 @page "/recipes"
 @using BlazorApp1.Components
+@inject IJSRuntime Js
 
 <pagetitle class="text-2xl font-bold">Recipes</pagetitle>
-<div class="flex gap-4 items-end pb-3">
+
+<div class="flex gap-4 items-end pt-3 pb-3">
     <div class="relative w-1/5">
         <label for="search" class="block mb-2 text-sm font-medium text-gray-900">Search</label>
         <input type="text" id="search" @bind="SearchText"
                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 pr-10"
                placeholder="Search recipes..." />
-        <button @onclick="PerformSearch"
+        <button @onclick="Search"
                 class="absolute inset-y-0 right-0 rounded-r items-center pt-6 pr-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="20px" height="20px"><path d="M 13 3 C 7.4889971 3 3 7.4889971 3 13 C 3 18.511003 7.4889971 23 13 23 C 15.396508 23 17.597385 22.148986 19.322266 20.736328 L 25.292969 26.707031 A 1.0001 1.0001 0 1 0 26.707031 25.292969 L 20.736328 19.322266 C 22.148986 17.597385 23 15.396508 23 13 C 23 7.4889971 18.511003 3 13 3 z M 13 5 C 17.430123 5 21 8.5698774 21 13 C 21 17.430123 17.430123 21 13 21 C 8.5698774 21 5 17.430123 5 13 C 5 8.5698774 8.5698774 5 13 5 z"/></svg>
         </button>
@@ -20,7 +22,7 @@
             <option value="">Select type</option>
             @foreach (var type in Types)
             {
-            <option value="@type">@type</option>
+                <option value="@type">@type</option>
             }
         </select>
     </div>
@@ -37,40 +39,217 @@
     </div>
     <div class="flex-grow"></div>
     <div class="flex space-x-4 items-end">
-        <button @onclick="ShowNewIngredientPopup"
+        <button @onclick="NewIngredientDialog"
                 class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
             New Ingredient
         </button>
-        <button @onclick="ShowNewRecipePopup"
+        <button @onclick="NewRecipeDialog"
                 class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
             New Recipe
         </button>
     </div>
 </div>
 
+<!-- Ingredient Dialog -->
+<dialog id="newIngredientDialog" class="rounded-lg p-6 bg-white shadow-lg w-1/3">
+    <form method="dialog" class="flex flex-col space-y-4" onsubmit="return false;">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold">New Ingredient</h3>
+            <button type="button" @onclick="CancelIngredient" class="text-gray-500 hover:text-gray-700">
+                &times;
+            </button>
+        </div>
+        <div>
+            <label for="ingredientName" class="block mb-2 text-sm font-medium text-gray-900">Name *</label>
+            <input type="text" id="ingredientName" name="ingredientName" @bind="IngredientName"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 @(FieldErrors["ingredientName"] ? "border-red-500" : "")"
+                   placeholder="Enter ingredient name" />
+        </div>
+        <div>
+            <label for="ingredientType" class="block mb-2 text-sm font-medium text-gray-900">Type *</label>
+            <select id="ingredientType" name="ingredientType" @bind="IngredientType"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 @(FieldErrors["ingredientType"] ? "border-red-500" : "")">
+                <option value="">Select type</option>
+                @foreach (var type in Types)
+                {
+                    <option value="@type">@type</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label for="ingredientCalories" class="block mb-2 text-sm font-medium text-gray-900">Calories *</label>
+            <input type="number" id="ingredientCalories" name="ingredientCalories" @bind="IngredientCalories"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 @(FieldErrors["ingredientCalories"] ? "border-red-500" : "")"
+                   placeholder="Enter calories" />
+        </div>
+        <div class="flex items-center">
+            <input type="checkbox" id="isAllergen" name="isAllergen" @bind="IsAllergen" class="mr-2" />
+            <label for="isAllergen" class="text-sm font-medium text-gray-900">Is allergen?</label>
+        </div>
+        <div class="flex justify-end space-x-4">
+            @if (IsError)
+            {
+                <p style="color: red; margin-right: auto; font-size: x-small;">Please fill in all fields.</p>
+            }
+            <button type="button" @onclick="AddIngredient"
+                    class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
+                Add
+            </button>
+            <button type="button" @onclick="CancelIngredient"
+                    class="bg-red-600 font-normal text-sm hover:bg-red-700 text-white py-2 px-4 rounded">
+                Cancel
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Recipe Dialog -->
+<dialog id="newRecipeDialog" class="rounded-lg p-6 bg-white shadow-lg w-1/3">
+    <form method="dialog" class="flex flex-col space-y-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold">New Recipe</h3>
+            <button type="button" @onclick="CancelRecipe" class="text-gray-500 hover:text-gray-700">
+                &times;
+            </button>
+        </div>
+        <!-- Add fields for new recipe here -->
+        <div class="flex justify-end space-x-4">
+            <button type="submit" @onclick="AddRecipe"
+                    class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
+                Add
+            </button>
+            <button type="button" @onclick="CancelRecipe"
+                    class="bg-gray-600 font-normal text-sm hover:bg-gray-700 text-white py-2 px-4 rounded">
+                Cancel
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Error Dialog -->
+<dialog id="errorDialog" class="rounded-lg p-6 bg-white shadow-lg w-1/3">
+    <div class="flex flex-col space-y-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold">Error</h3>
+            <button type="button" @onclick="CloseDialog" class="text-gray-500 hover:text-gray-700">
+                &times;
+            </button>
+        </div>
+        <p>@ErrorMessage</p>
+        <div class="flex justify-end space-x-4">
+            <button type="button" @onclick="ContinueDialog"
+                    class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
+                Continue
+            </button>
+            <button type="button" @onclick="CloseDialog"
+                    class="bg-red-600 font-normal text-sm hover:bg-red-700 text-white py-2 px-4 rounded">
+                Close
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<!-- Success Dialog -->
+<dialog id="successDialog" class="rounded-lg p-6 bg-white shadow-lg w-1/3">
+    <div class="flex flex-col space-y-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold">Success</h3>
+        </div>
+        <p>Ingredient successfully added!</p>
+    </div>
+</dialog>
+
 <div class="flex gap-4">
     @foreach (var recipe in FilteredRecipes)
     {
-        <RecipeCard
-            ImageUrl="assets/spaghetti-bolog.jpg"
-            Title="@recipe.Title"
-            Description="@recipe.Description"
-            Types="@recipe.Types"
-            Ingredients="@recipe.Ingredients"
-            Allergens="@recipe.Allergens"
-            Editable="true"
-        />
+        <div class="flex-1 max-w-[33%]">
+            <RecipeCard
+                ImageUrl="assets/spaghetti-bolog.jpg"
+                Title="@recipe.Title"
+                Description="@recipe.Description"
+                Types="@recipe.Types"
+                Ingredients="@recipe.Ingredients"
+                Allergens="@recipe.Allergens"
+                Editable="true"
+            />
+        </div>
     }
 </div>
 
 @code {
+    // Ingredient properties and methods
+    private string IngredientName { get; set; } = string.Empty;
+    private string IngredientType { get; set; } = string.Empty;
+    private int IngredientCalories { get; set; }
+    private bool IsAllergen { get; set; }
+
+    private Dictionary<string, bool> FieldErrors = new()
+    {
+        { "ingredientName", false },
+        { "ingredientType", false },
+        { "ingredientCalories", false }
+    };
+
+    private void ValidateFields()
+    {
+        FieldErrors["ingredientName"] = string.IsNullOrWhiteSpace(IngredientName);
+        FieldErrors["ingredientType"] = string.IsNullOrWhiteSpace(IngredientType);
+        FieldErrors["ingredientCalories"] = IngredientCalories <= 0;
+
+        IsError = FieldErrors.Values.Any(v => v);
+    }
+
+    private async Task NewIngredientDialog()
+    {
+        await Js.InvokeVoidAsync("showDialog", "newIngredientDialog");
+    }
+
+    private async Task HideNewIngredientDialog()
+    {
+        await Js.InvokeVoidAsync("hideDialog", "newIngredientDialog");
+    }
+
+    private async Task CancelIngredient()
+    {
+        ErrorMessage = "Canceling will discard all changes. Are you sure?";
+        await Js.InvokeVoidAsync("showDialog", "errorDialog");
+    }
+
+    private void AddIngredient()
+    {
+        ValidateFields();
+        if (!IsError)
+        {
+            HideNewIngredientDialog();
+            Js.InvokeVoidAsync("console.log", $"Ingredient Name: {IngredientName}, Type: {IngredientType}, Calories: {IngredientCalories}, Is Allergen: {IsAllergen}");
+            SuccessMessage();
+        }
+    }
+
+    private async void SuccessMessage()
+    {
+        await Js.InvokeVoidAsync("showDialog", "successDialog");
+        await Task.Delay(2000);
+        await Js.InvokeVoidAsync("hideDialog", "successDialog");
+    }
+
+    // Recipe properties and methods
     private string SearchText { get; set; } = string.Empty;
     private string SelectedType { get; set; } = string.Empty;
     private string SelectedAllergen { get; set; } = string.Empty;
-    
+
     List<string> Types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
     List<string> Ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
-    List<string> Allergens = new List<string> { "Gluten", "Peanuts", "Dairy", "Soy" };
+    List<string> Allergens = new List<string> { "Gluten", "Peanuts", "Eggs", "Soy" };
+
+    private class RecipeModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public List<string> Types { get; set; } = new List<string>();
+        public List<string> Ingredients { get; set; } = new List<string>();
+        public List<string> Allergens { get; set; } = new List<string>();
+    }
 
     private List<RecipeModel> Recipes = new List<RecipeModel>
     {
@@ -79,34 +258,62 @@
         new RecipeModel { Title = "Spaghetti bla bla bla", Description = "Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway.", Types = new List<string> { "Vegetarian" }, Ingredients = new List<string> { "Pasta", "Tomato" }, Allergens = new List<string> {"Peanuts"} },
     };
 
-    
     private List<RecipeModel> FilteredRecipes => Recipes
         .Where(r => (string.IsNullOrEmpty(SearchText) || r.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || r.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || r.Types.Any(t => t.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) || r.Ingredients.Any(i => i.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
                     && (string.IsNullOrEmpty(SelectedType) || r.Types.Contains(SelectedType))
                     && (string.IsNullOrEmpty(SelectedAllergen) || !r.Allergens.Contains(SelectedAllergen)))
         .ToList();
 
-    private void ShowNewIngredientPopup()
+    private async Task NewRecipeDialog()
     {
-        
+        await Js.InvokeVoidAsync("showDialog", "newRecipeDialog");
     }
 
-    private void ShowNewRecipePopup()
+    private async Task HideNewRecipeDialog()
     {
-
+        await Js.InvokeVoidAsync("hideDialog", "newRecipeDialog");
     }
 
-    private void PerformSearch()
+    private async Task CancelRecipe()
+    {
+        ErrorMessage = "Canceling will discard all changes. Are you sure?";
+        await Js.InvokeVoidAsync("showDialog", "errorDialog");
+    }
+
+    private void AddRecipe()
+    {
+        HideNewRecipeDialog();
+        // Js.InvokeVoidAsync("console.log", $"Recipe Title: {NewRecipeTitle}, Description: {NewRecipeDescription}, Types: {string.Join(", ", NewRecipeTypes)}, Ingredients: {string.Join(", ", NewRecipeIngredients)}, Allergens: {string.Join(", ", NewRecipeAllergens)}");
+    }
+
+    private void Search()
     {
         StateHasChanged();
     }
 
-    private class RecipeModel
+    // Error dialog methods
+    private bool IsError { get; set; } = false;
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    private async Task ContinueDialog()
     {
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public List<string> Types { get; set; }
-        public List<string> Ingredients { get; set; }
-        public List<string> Allergens { get; set; }
+        await Js.InvokeVoidAsync("hideDialog", "errorDialog");
+        await Js.InvokeVoidAsync("showDialog", "newIngredientDialog");
+    }
+
+    private async Task CloseDialog()
+    {
+        await Js.InvokeVoidAsync("hideDialog", "errorDialog");
+        await Js.InvokeVoidAsync("hideDialog", "newIngredientDialog");
     }
 }
+
+<script>
+    window.showDialog = (dialogId) => {
+        document.getElementById(dialogId).showModal();
+    };
+
+    window.hideDialog = (dialogId) => {
+        document.getElementById(dialogId).close();
+    };
+</script>
