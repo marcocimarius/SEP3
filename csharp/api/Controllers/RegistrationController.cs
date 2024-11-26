@@ -29,7 +29,16 @@ public class RegistrationController(GrpcClient grpcService) : ControllerBase
             IsAdmin = res.IsAdmin,
             Email = res.Email
         };
-        bool logged = PasswordService.Verify(req.Password, res.Password);
+        bool logged = false;
+        if (!res.IsAdmin)
+        {
+            logged = PasswordService.Verify(req.Password, res.Password);
+        }
+
+        if (res.IsAdmin)
+        {
+            logged = String.Equals(req.Password, res.Password);
+        }
         if (!logged) return Unauthorized();
         return apiRes;
     }

@@ -45,7 +45,7 @@
         try
         {
             await ((AuthProvider)authProvider).Login(email, password);
-            navMgr.NavigateTo("/");
+            navMgr.NavigateTo("/", true);
         }
         catch (Exception ex)
         {

@@ -77,7 +77,7 @@ public class AuthProvider : AuthenticationStateProvider
         {
             new Claim("Id", loginResponse.Id.ToString()),
             new Claim("Email", loginResponse.Email),
-            new Claim("Role", loginResponse.IsAdmin ? "Admin" : "User")
+            new Claim(ClaimTypes.Role, loginResponse.IsAdmin ? "Admin" : "User")
         };
         ClaimsIdentity identity = new ClaimsIdentity(claims, "apiauth");
         ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(identity);
