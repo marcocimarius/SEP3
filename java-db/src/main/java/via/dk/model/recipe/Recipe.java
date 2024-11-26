@@ -1,6 +1,10 @@
 package via.dk.model.recipe;
 
+import via.dk.Ingredient;
+import via.dk.model.ingredient.IngredientModel;
+
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Recipe
 {
@@ -12,9 +16,10 @@ public class Recipe
   private Timestamp creationDate;
   private Timestamp modificationDate;
   private String imageLink;
+  private List<IngredientModel> ingredients;
 
   public Recipe(int id, String name, String type, boolean containsAllergen,
-      int calories, Timestamp creationDate, Timestamp modificationDate, String imageLink)
+      int calories, Timestamp creationDate, Timestamp modificationDate, String imageLink, List<IngredientModel> ingredients)
   {
     this.id = id;
     this.name = name;
@@ -24,6 +29,7 @@ public class Recipe
     this.creationDate = creationDate;
     this.modificationDate = modificationDate;
     this.imageLink = imageLink;
+    this.ingredients = ingredients;
   }
 
   public Integer getId()
@@ -104,5 +110,10 @@ public class Recipe
   public void setModificationDate(Timestamp modificationDate)
   {
     this.modificationDate = modificationDate;
+  }
+
+  public List<IngredientModel> getIngredients()
+  {
+    return ingredients;
   }
 }

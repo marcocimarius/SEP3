@@ -13,15 +13,14 @@ message Recipe {
   google.protobuf.Timestamp creation_date = 6;
   google.protobuf.Timestamp modification_date = 7;
   string image_link = 8;
+  repeated int32 ingredients_id = 9;
 }
 
 
 message CreateRecipeRequest {
   string name = 1;
-  string type = 2;
-  bool contains_allergen = 3;
-  int32 calories = 4;
-  string image_link = 5;
+  string image_link = 2;
+  repeated int32 ingredients_id = 3;
 }
 
 message CreateRecipeResponse {
