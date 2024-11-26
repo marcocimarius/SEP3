@@ -42,4 +42,11 @@ public class RegistrationController(GrpcClient grpcService) : ControllerBase
         if (!logged) return Unauthorized();
         return apiRes;
     }
+    
+    [HttpPost]
+    [Route("customer-information")]
+    public async Task<ActionResult<string>> Post([FromBody] CreateCustomerInformationRequest req)
+    {
+        return await grpcService.CreateCustomerInformation(req.FirstName, req.LastName, req.CountryName, req.CityName, req.StreetName, req.PostNumber, req.Phone);
+    }
 }
