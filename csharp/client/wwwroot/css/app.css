@@ -6,4 +6,7 @@
     html {
         font-family: "Montserrat", system-ui, sans-serif;
     }
+    .link {
+        @apply text-sm text-blue-500 hover:underline;
+    }
 }
