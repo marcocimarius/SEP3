@@ -159,7 +159,7 @@ public class RecipeDaoImpl implements IRecipeDao
       return status;
     }
 
-    return allSuccess ? 1 : -1; //i dont fucking understand how this works. the batch seems to always return smth negative
+    return allSuccess ? 1 : -1;
   }
 
   @Override public int delete(DeleteRecipeRequest recipe) throws SQLException

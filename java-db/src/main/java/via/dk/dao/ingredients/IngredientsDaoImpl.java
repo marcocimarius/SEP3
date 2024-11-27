@@ -31,19 +31,20 @@ public class IngredientsDaoImpl implements IIngredientsDao
       statement.setBoolean(3, ingredient.isAllergen());
       ResultSet resultSet = statement.executeQuery();
       while (resultSet.next()) {
-        //if (resultSet.getFetchSize() == 1) {
-          int ingredientId = resultSet.getInt("id");
-          statement = db.prepareStatement("""
-          insert into ingredient_type (type_id, ingredient_id)
-          values (?, ?)
-          """);
+        int ingredientId = resultSet.getInt("id");
+        statement = db.prepareStatement("""
+            insert into ingredient_type (type_id, ingredient_id)
+            values (?, ?)
+            """);
 
-          statement.setInt(1, typeId);
-          statement.setInt(2, ingredientId);
-          if (statement.executeUpdate() == 0) {
-            throw new SQLException("Failed to create the ingredient_type table on type_id = " + typeId + " and ingredient_id = " + ingredientId);
-          }
-        //}
+        statement.setInt(1, typeId);
+        statement.setInt(2, ingredientId);
+        if (statement.executeUpdate() == 0)
+        {
+          throw new SQLException(
+              "Failed to create the ingredient_type table on type_id = "
+                  + typeId + " and ingredient_id = " + ingredientId);
+        }
       }
     }
     else {

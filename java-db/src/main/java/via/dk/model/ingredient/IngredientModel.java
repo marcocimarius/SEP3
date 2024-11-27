@@ -93,12 +93,4 @@ public class IngredientModel
   {
     this.type = type;
   }
-
-  @Override public String toString()
-  {
-    return "IngredientModel{" + "id=" + id + ", name='" + name + '\''
-        + ", calories=" + calories + ", isAllergen=" + isAllergen
-        + ", creationDate=" + creationDate + ", modificationDate="
-        + modificationDate + ", type='" + type + '\'' + '}';
-  }
 }

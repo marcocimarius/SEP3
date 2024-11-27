@@ -1,6 +1,5 @@
 package via.dk.model.recipe;
 
-import via.dk.Ingredient;
 import via.dk.model.ingredient.IngredientModel;
 
 import java.sql.Timestamp;
@@ -11,12 +10,12 @@ public class Recipe
   private Integer id;
   private String name;
   private String type;
-  private boolean containsAllergen;
+  private final boolean containsAllergen;
   private int calories;
-  private Timestamp creationDate;
-  private Timestamp modificationDate;
-  private String imageLink;
-  private List<IngredientModel> ingredients;
+  private final Timestamp creationDate;
+  private final Timestamp modificationDate;
+  private final String imageLink;
+  private final List<IngredientModel> ingredients;
 
   public Recipe(int id, String name, String type, boolean containsAllergen,
       int calories, Timestamp creationDate, Timestamp modificationDate, String imageLink, List<IngredientModel> ingredients)
@@ -47,11 +46,6 @@ public class Recipe
     return imageLink;
   }
 
-  public void setImageLink(String imageLink)
-  {
-    this.imageLink = imageLink;
-  }
-
   public String getName()
   {
     return name;
@@ -77,11 +71,6 @@ public class Recipe
     return containsAllergen;
   }
 
-  public void setContainsAllergen(boolean containsAllergen)
-  {
-    this.containsAllergen = containsAllergen;
-  }
-
   public int getCalories()
   {
     return calories;
@@ -97,32 +86,13 @@ public class Recipe
     return creationDate;
   }
 
-  public void setCreationDate(Timestamp creationDate)
-  {
-    this.creationDate = creationDate;
-  }
-
   public Timestamp getModificationDate()
   {
     return modificationDate;
   }
 
-  public void setModificationDate(Timestamp modificationDate)
-  {
-    this.modificationDate = modificationDate;
-  }
-
   public List<IngredientModel> getIngredients()
   {
     return ingredients;
-  }
-
-  @Override public String toString()
-  {
-    return "Recipe{" + "id=" + id + ", name='" + name + '\'' + ", type='" + type
-        + '\'' + ", containsAllergen=" + containsAllergen + ", calories="
-        + calories + ", creationDate=" + creationDate + ", modificationDate="
-        + modificationDate + ", imageLink='" + imageLink + '\''
-        + ", ingredients=" + ingredients + '}';
   }
 }
