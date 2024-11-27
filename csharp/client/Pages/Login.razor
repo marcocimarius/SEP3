@@ -20,6 +20,7 @@
                 />
             </div>
         </div>
+        <NavLink href="register"><span class="link">You don't have an account?</span></NavLink>
         <div class="py-2 flex justify-end items-center">
             <p style="color: gray; margin-right: auto; font-size: small">* required fields</p>
             @if (!String.IsNullOrEmpty(error))
@@ -45,12 +46,11 @@
         try
         {
             await ((AuthProvider)authProvider).Login(email, password);
-            navMgr.NavigateTo("/");
+            navMgr.NavigateTo("/", true);
         }
         catch (Exception ex)
         {
             error = ex.Message;
         }
     }
-
 }
