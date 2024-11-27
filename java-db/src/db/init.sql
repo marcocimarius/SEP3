@@ -1,11 +1,3 @@
-DROP TABLE IF EXISTS test;
-CREATE TABLE test
-(
-    id serial PRIMARY KEY,
-    name VARCHAR,
-    description VARCHAR
-);
-
 create table country(
     id serial primary key,
     name varchar(100)
@@ -192,7 +184,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE TRIGGER trigger_update_recipe
-AFTER INSERT ON recipes_with_ingredients
+AFTER INSERT OR UPDATE ON recipes_with_ingredients
 FOR EACH ROW
 EXECUTE FUNCTION update_recipe_on_ingredient_add();
 
@@ -360,9 +352,6 @@ INSERT INTO selection_recipe (recipe_id, selection_id) VALUES
 (3, 1),
 (4, 1);  -- Bind all recipes to the customer week
 
-
-select * from recipe;
-
 drop trigger trg_check_recipe_in_admin_week on selection_recipe;
 drop trigger trigger_update_recipe on recipes_with_ingredients;
 drop trigger trg_check_cancel_date on selection;
@@ -386,5 +375,3 @@ drop table registration;
 drop table address;
 drop table city;
 drop table country;
-
-select * from registration;

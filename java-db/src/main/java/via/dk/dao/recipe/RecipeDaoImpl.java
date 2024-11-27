@@ -1,6 +1,8 @@
 package via.dk.dao.recipe;
 
 import via.dk.CreateRecipeRequest;
+import via.dk.DeleteRecipeRequest;
+import via.dk.UpdateRecipeRequest;
 import via.dk.model.ingredient.IngredientModel;
 import via.dk.model.recipe.Recipe;
 import via.dk.util.DatabaseConnection;
@@ -17,30 +19,28 @@ public class RecipeDaoImpl implements IRecipeDao
   {
     PreparedStatement statement = db.prepareStatement("""
         insert into recipe (name, image_link) values (?, ?)
+        returning id
         """);
     statement.setString(1, recipe.getName());
     statement.setString(2, recipe.getImageLink());
-    if (statement.executeUpdate() != 0) {
-      statement = db.prepareStatement("""
-          insert into ingredient_type (type_id, ingredient_id)
-          values (?, ?)
-          """);
-      for (int i = 0; i < recipe.getIngredientsIdList().size(); i++)
-      {
-        PreparedStatement typeIdStatement = db.prepareStatement("""
-            select type.id from type
-            inner join ingredient_type on type.id = ingredient_type.type_id
-            where ingredient_type.ingredient_id = ?""");
-        typeIdStatement.setInt(1, recipe.getIngredientsIdList().get(i));
-        ResultSet typeIdResultSet = typeIdStatement.executeQuery();
-        int type_id = typeIdResultSet.getInt("id");
-        statement.setInt(1, type_id);
-        statement.setInt(2, recipe.getIngredientsIdList().get(i));
-        statement.addBatch();
+    ResultSet resultSet = statement.executeQuery();
+    int newRecipeId = 0;
+    if (resultSet.next()) {
+      newRecipeId = resultSet.getInt("id");
+      PreparedStatement recipeWithIngredientsStatement = db.prepareStatement(
+          """
+              insert into recipes_with_ingredients (recipe_id, ingredient_id)
+              values (?, ?)
+              """);
+
+      for (int i = 0; i < recipe.getIngredientsIdList().size(); i++) {
+        recipeWithIngredientsStatement.setInt(1, newRecipeId);
+        recipeWithIngredientsStatement.setInt(2, recipe.getIngredientsIdList().get(i));
+        recipeWithIngredientsStatement.addBatch();
       }
 
-      int[] results = statement.executeBatch();
-      for (int result : results) {
+      int[] results2 = recipeWithIngredientsStatement.executeBatch();
+      for (int result : results2) {
         if (result == -3) {
           return -1;
         }
@@ -58,8 +58,8 @@ public class RecipeDaoImpl implements IRecipeDao
     ResultSet resultSet = statement.executeQuery();
     List<Recipe> recipes = new ArrayList<>();
 
-    while (resultSet.next()) {
-      if (!resultSet.wasNull()) {
+    if (!resultSet.wasNull()) {
+      while (resultSet.next()) {
         int recipeId = resultSet.getInt("id");
         PreparedStatement recipeStatement = db.prepareStatement("""
           select ingredient.*, type.type from ingredient
@@ -67,6 +67,7 @@ public class RecipeDaoImpl implements IRecipeDao
           inner join ingredient_type on ingredient.id = ingredient_type.ingredient_id
           inner join type on ingredient_type.type_id = type.id
           where recipes_with_ingredients.recipe_id = ?
+          group by ingredient.id, type.type
           order by id
           """);
 
@@ -99,5 +100,86 @@ public class RecipeDaoImpl implements IRecipeDao
     }
 
     return recipes;
+  }
+
+  @Override public int update(UpdateRecipeRequest recipe) throws SQLException
+  {
+    int status = 0;
+    PreparedStatement statement = db.prepareStatement("""
+        update recipe \s
+        set name = ?,
+            type = ?,
+            contains_allergen = ?,
+            calories = ?,
+            image_link = ?
+            where id = ?
+        """);
+    statement.setString(1, recipe.getName());
+    statement.setString(2, "vegan");
+    statement.setBoolean(3, false);
+    statement.setInt(4, 0);
+    statement.setString(5, recipe.getImageLink());
+    statement.setInt(6, recipe.getId());
+
+    status = statement.executeUpdate();
+    boolean allSuccess = true;
+    if (status != 0) {
+      statement = db.prepareStatement("""
+          delete from recipes_with_ingredients \s
+          where recipe_id = ?
+          """);
+      statement.setInt(1, recipe.getId());
+      status = statement.executeUpdate();
+      if (status != 0) {
+        statement = db.prepareStatement("""
+              insert into recipes_with_ingredients (recipe_id, ingredient_id)
+              values (?, ?)
+              """);
+        for (int i = 0; i < recipe.getIngredientsIdList().size(); i++)
+        {
+          statement.setInt(1, recipe.getId());
+          statement.setInt(2, recipe.getIngredientsIdList().get(i));
+          statement.addBatch();
+        }
+      }
+      else {
+        return 0;
+      }
+
+
+      int[] results = statement.executeBatch();
+      for (int result : results) {
+        if (result < 0) {
+          allSuccess = false;
+          break;
+        }
+      }
+    }
+    else {
+      return status;
+    }
+
+    return allSuccess ? 1 : -1; //i dont fucking understand how this works. the batch seems to always return smth negative
+  }
+
+  @Override public int delete(DeleteRecipeRequest recipe) throws SQLException
+  {
+    PreparedStatement statement = db.prepareStatement("""
+        delete from recipes_with_ingredients where recipe_id = ?
+        """);
+    statement.setInt(1, recipe.getId());
+    statement.executeUpdate();
+
+    statement = db.prepareStatement("""
+         delete from recipe where id = ?
+    """);
+    statement.setInt(1, recipe.getId());
+
+    if (statement.executeUpdate() == 0) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
   }
 }

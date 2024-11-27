@@ -23,6 +23,25 @@ message CreateRecipeRequest {
   repeated int32 ingredients_id = 3;
 }
 
+message UpdateRecipeRequest {
+  int32 id = 1;
+  string name = 2;
+  string image_link = 3;
+  repeated int32 ingredients_id = 4;
+}
+
+message UpdateRecipeResponse {
+  string status = 1;
+}
+
+message DeleteRecipeRequest {
+  int32 id = 1;
+}
+
+message DeleteRecipeResponse {
+  string status = 1;
+}
+
 message CreateRecipeResponse {
   string status = 1;
 }
@@ -39,4 +58,6 @@ message RetrieveRecipeResponse {
 service RecipeService {
   rpc CreateRecipe(CreateRecipeRequest) returns (CreateRecipeResponse);
   rpc GetAllRecipes(RetrieveRecipeRequest) returns (RetrieveRecipeResponse);
+  rpc UpdateRecipe(UpdateRecipeRequest) returns (UpdateRecipeResponse);
+  rpc DeleteRecipe(DeleteRecipeRequest) returns (DeleteRecipeResponse);
 }

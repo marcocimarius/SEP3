@@ -116,4 +116,13 @@ public class Recipe
   {
     return ingredients;
   }
+
+  @Override public String toString()
+  {
+    return "Recipe{" + "id=" + id + ", name='" + name + '\'' + ", type='" + type
+        + '\'' + ", containsAllergen=" + containsAllergen + ", calories="
+        + calories + ", creationDate=" + creationDate + ", modificationDate="
+        + modificationDate + ", imageLink='" + imageLink + '\''
+        + ", ingredients=" + ingredients + '}';
+  }
 }
