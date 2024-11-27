@@ -12,26 +12,29 @@ public class CustomerInformationDaoImpl implements ICustomerInformationDao {
 		PreparedStatement countrySelectStmt = db.prepareStatement("select * from country where name = ?");
 		countrySelectStmt.setString(1, name);
 		ResultSet rs = countrySelectStmt.executeQuery();
-		rs.next();
-		int countryId = rs.getInt("id");
-		return countryId;
+		if(rs.next()){
+			return rs.getInt("id");
+		}
+		return 0;
 	}
 	private int getCityId(String name) throws SQLException{
 		PreparedStatement citySelectStmt = db.prepareStatement("select * from city where name = ?");
 		citySelectStmt.setString(1, name);
 		ResultSet rs = citySelectStmt.executeQuery();
-		rs.next();
-		int cityId = rs.getInt("id");
-		return cityId;
+		if(rs.next()){
+			return rs.getInt("id");
+		}
+		return 0;
 	}
 
 	private int getAddressId(String name) throws SQLException{
 		PreparedStatement addressSelectStmt = db.prepareStatement("select * from address where street_name = ?");
 		addressSelectStmt.setString(1, name);
 		ResultSet rs = addressSelectStmt.executeQuery();
-		rs.next();
-		int addressId = rs.getInt("id");
-		return addressId;
+		if(rs.next()){
+			return rs.getInt("id");
+		}
+		return 0;
 	}
 
 	@Override

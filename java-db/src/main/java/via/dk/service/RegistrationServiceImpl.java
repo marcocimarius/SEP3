@@ -68,6 +68,7 @@ public class RegistrationServiceImpl extends RegistrationServiceGrpc.Registratio
 			}
 		} catch (Exception e) {
 			responseObserver.onError(e);
+			return;
 		}
 		CreateCustomerInformationResponse response = CreateCustomerInformationResponse.newBuilder().setStatus("SUCCESS: Customer information creation successful").build();
 		responseObserver.onNext(response);
