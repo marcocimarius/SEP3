@@ -20,7 +20,7 @@ public class AuthProvider : AuthenticationStateProvider
     }
 
 
-    public async Task Login(string username, string password)
+    public async Task<AuthenticationState> Login(string username, string password)
     {
         LoginRequest loginRequest = new LoginRequest
         {
@@ -53,6 +53,7 @@ public class AuthProvider : AuthenticationStateProvider
 
         NotifyAuthenticationStateChanged(
             Task.FromResult(new AuthenticationState(currentClaimsPrincipal)));
+        return new AuthenticationState(currentClaimsPrincipal);
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()

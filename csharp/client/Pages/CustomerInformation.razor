@@ -1,8 +1,10 @@
 ﻿@page "/register"
+@using BlazorApp1.Providers
 @using Via.Dk
 @inject HttpClient Http
 @inject IJSRuntime JS
 @inject NavigationManager navMgr
+@inject AuthenticationStateProvider authProvider;
 
 <PageTitle>Registration</PageTitle>
 
@@ -145,30 +147,34 @@
             await JS.InvokeVoidAsync("console.log", $"First Name: {FirstName}, Last Name: {LastName}, Country: {Country}, City: {City}, Street: {Street}, Zip Code: {ZipCode}");
         }
 
-        var res1 = await RegisterUser();
+        await RegisterUser();
         var res2 = await CreateCustomerInformation();
-        if (res1.IsSuccessStatusCode && res2.IsSuccessStatusCode)
+        if (res2.IsSuccessStatusCode)
         {
-            navMgr.NavigateTo("/login");
+            navMgr.NavigateTo("/");
         }
     }
 
     private async Task<HttpResponseMessage> CreateCustomerInformation()
     {
+        var auth = await authProvider.GetAuthenticationStateAsync();
+
+        var userId = int.Parse(auth.User.Claims.First(c => String.Equals(c.Type, "Id")).Value);
         CreateCustomerInformationRequest request = new CreateCustomerInformationRequest
         {
+            UserId = userId,
             FirstName = FirstName,
             LastName = LastName,
             Phone = Phone,
             CountryName = Country,
             CityName = City,
             StreetName = Street,
-            PostNumber = ZipCode
+            PostNumber = ZipCode,
         };
         return await Http.PostAsJsonAsync("api/registration/customer-information", request);
     }
 
-    private async Task<HttpResponseMessage> RegisterUser()
+    private async Task RegisterUser()
     {
         CreateRegistrationRequest request = new CreateRegistrationRequest
         {
@@ -176,7 +182,8 @@
             Password = Password,
             IsAdmin = false
         };
-        return await Http.PostAsJsonAsync("api/registration", request);
+        await Http.PostAsJsonAsync("api/registration", request);
+        await ((AuthProvider)authProvider).Login(Email, Password);
     }
 
 }
