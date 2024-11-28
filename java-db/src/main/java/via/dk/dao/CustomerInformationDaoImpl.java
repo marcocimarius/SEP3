@@ -64,11 +64,12 @@ public class CustomerInformationDaoImpl implements ICustomerInformationDao {
 			addressInsertStmt.executeUpdate();
 		}
 		addressId = getAddressId(ci.getStreetName());
-		PreparedStatement customerInsertStmt = db.prepareStatement("insert into customer_information (first_name, last_name, phone, delivery_address_id) values (?, ?, ?, ?)");
+		PreparedStatement customerInsertStmt = db.prepareStatement("insert into customer_information (first_name, last_name, phone, delivery_address_id, registration_id) values (?, ?, ?, ?, ?)");
 		customerInsertStmt.setString(1, ci.getFirstName());
 		customerInsertStmt.setString(2, ci.getLastName());
 		customerInsertStmt.setString(3, ci.getPhone());
 		customerInsertStmt.setInt(4, addressId);
+		customerInsertStmt.setInt(5, ci.getRegistrationId());
 		int result = customerInsertStmt.executeUpdate();
 		return result;
 	}

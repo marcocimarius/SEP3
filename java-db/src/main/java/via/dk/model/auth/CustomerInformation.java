@@ -1,6 +1,7 @@
 package via.dk.model.auth;
 
 public class CustomerInformation implements ICustomerInformation {
+	private int registrationId;
 	private String firstName;
 	private String lastName;
 	private String phone;
@@ -11,6 +12,7 @@ public class CustomerInformation implements ICustomerInformation {
 	private String countryName;
 
 	public CustomerInformation() {
+		this.registrationId = 0;
 		this.firstName = "";
 		this.lastName = "";
 		this.phone = "";
@@ -21,7 +23,8 @@ public class CustomerInformation implements ICustomerInformation {
 		this.countryName = "";
 	}
 
-	public CustomerInformation(String firstName, String lastName, String phone, String streetName, String streetNumber, String cityName, String postNumber, String countryName) {
+	public CustomerInformation(int registrationId, String firstName, String lastName, String phone, String streetName, String streetNumber, String cityName, String postNumber, String countryName) {
+		this.registrationId = registrationId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.phone = phone;
@@ -30,6 +33,10 @@ public class CustomerInformation implements ICustomerInformation {
 		this.cityName = cityName;
 		this.postNumber = postNumber;
 		this.countryName = countryName;
+	}
+
+	public int getRegistrationId() {
+		return registrationId;
 	}
 
 	public String getFirstName() {
@@ -62,6 +69,10 @@ public class CustomerInformation implements ICustomerInformation {
 
 	public String getCountryName() {
 		return countryName;
+	}
+
+	public void setRegistrationId(int id) {
+		this.registrationId = id;
 	}
 
 	public void setFirstName(String firstName) {

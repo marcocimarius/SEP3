@@ -1,6 +1,8 @@
 package via.dk.model.auth;
 
 public interface ICustomerInformation {
+	public int getRegistrationId();
+
 	public String getFirstName();
 
 	public String getLastName();
@@ -17,6 +19,8 @@ public interface ICustomerInformation {
 
 	public String getCountryName();
 
+	public void setRegistrationId(int id);
+
 	public void setFirstName(String str);
 
 	public void setLastName(String str);
@@ -32,4 +36,5 @@ public interface ICustomerInformation {
 	public void setPostNumber(String str);
 
 	public void setCountryName(String str);
+
 }

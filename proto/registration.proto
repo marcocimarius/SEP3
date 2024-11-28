@@ -39,6 +39,7 @@ message CreateCustomerInformationRequest{
   string cityName = 5;
   string postNumber = 6;
   string countryName = 7;
+  int32 userId = 8;
 }
 
 message CreateCustomerInformationResponse{

@@ -32,11 +32,12 @@ public class GrpcClient
         return response.Status;
     }
 
-    public async Task<string> CreateCustomerInformation(String firstName, String lastName, String country, String city,
+    public async Task<string> CreateCustomerInformation(int userId, String firstName, String lastName, String country, String city,
         String address, String postalCode, String phoneNumber)
     {
         var request = new CreateCustomerInformationRequest()
         {
+            UserId = userId,
             FirstName = firstName,
             LastName = lastName,
             Phone = phoneNumber,

@@ -52,7 +52,7 @@ public class RegistrationController(GrpcClient grpcService) : ControllerBase
         string? result = null;
         try
         {
-            result = await grpcService.CreateCustomerInformation(req.FirstName, req.LastName, req.CountryName, req.CityName, req.StreetName, req.PostNumber, req.Phone);
+            result = await grpcService.CreateCustomerInformation(req.UserId, req.FirstName, req.LastName, req.CountryName, req.CityName, req.StreetName, req.PostNumber, req.Phone);
         }
         catch (Exception e)
         {

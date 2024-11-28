@@ -60,7 +60,7 @@ public class RegistrationServiceImpl extends RegistrationServiceGrpc.Registratio
 
 	@Override
 	public void createCustomerInformation(CreateCustomerInformationRequest request, StreamObserver<CreateCustomerInformationResponse> responseObserver) {
-		ICustomerInformation ci = new CustomerInformation(request.getFirstName(), request.getLastName(), request.getPhone(), request.getStreetName(), "", request.getCityName(), request.getPostNumber(), request.getCountryName());
+		ICustomerInformation ci = new CustomerInformation(request.getUserId(), request.getFirstName(), request.getLastName(), request.getPhone(), request.getStreetName(), "", request.getCityName(), request.getPostNumber(), request.getCountryName());
 		try {
 			int result = customerInformationDao.create(ci);
 			if (result == 0) {
