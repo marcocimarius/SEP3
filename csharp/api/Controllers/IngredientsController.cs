@@ -18,20 +18,14 @@ public class IngredientsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IResult> CreateIngredient([FromBody] CreateIngredientRequest ingredient)
+    public async Task<ActionResult<string>> CreateIngredient([FromBody] CreateIngredientRequest ingredient)
     {
-        string response = await this._grpcService.IngredientsClient.CreateIngredientAsync(ingredient);
-        if (response.Contains("FAIL"))
-        {
-            return Results.BadRequest();
-        }
-
-        return Results.Ok("Ingredient created");
+        return await this._grpcService.IngredientsClient.CreateIngredientAsync(ingredient);
     }
 
     [HttpPut()]
     // [HttpPut("{id:int}")]
-    public async Task<IResult> UpdateIngredient([FromBody] UpdateIngredientDto ingredient)
+    public async Task<ActionResult<string>> UpdateIngredient([FromBody] UpdateIngredientDto ingredient)
     {
         var request = new UpdateIngredientRequest()
         {
@@ -39,27 +33,16 @@ public class IngredientsController : ControllerBase
             Name = ingredient.Name,
             Calories = ingredient.Calories,
             IsAllergen = ingredient.IsAllergen,
+            TypeId = ingredient.TypeId
         };
-        string response = await this._grpcService.IngredientsClient.UpdateIngredientAsync(request);
-        if (response.Contains("FAIL"))
-        {
-            return Results.BadRequest();
-        }
-
-        return Results.Ok("Ingredient updated");
+        return await this._grpcService.IngredientsClient.UpdateIngredientAsync(request);
     }
 
     [HttpDelete()]
     // [HttpDelete("{id:int}")]
-    public async Task<IResult> DeleteIngredient([FromBody] DeleteIngredientRequest ingredient)
+    public async Task<ActionResult<string>> DeleteIngredient([FromBody] DeleteIngredientRequest ingredient)
     {
-        string response =  await this._grpcService.IngredientsClient.DeleteIngredientAsync(ingredient);
-        if (response.Contains("FAIL"))
-        {
-            return Results.BadRequest();
-        }
-
-        return Results.Ok("Ingredient deleted");
+        return await this._grpcService.IngredientsClient.DeleteIngredientAsync(ingredient);
     }
     
     [HttpGet]

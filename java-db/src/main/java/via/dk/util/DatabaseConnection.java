@@ -8,6 +8,7 @@ public class DatabaseConnection {
 
 	private static Connection con = null;
 	// change based on your database
+
 	private static final String host = System.getenv("db_host");
 	private static final String database = System.getenv("db_name");
 	private static final String url = "jdbc:postgresql://" + host + "/" + database;

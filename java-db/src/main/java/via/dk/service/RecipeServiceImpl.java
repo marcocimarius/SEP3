@@ -21,7 +21,25 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
   @Override
   public void createRecipe(CreateRecipeRequest request,
       StreamObserver<CreateRecipeResponse> responseObserver) {
-    //needs more work
+    int status;
+    try {
+      status = recipeDao.create(request);
+      if (status == 0) {
+        throw new Exception("Fail creating the recipe itself, without adding ingredients");
+      }
+      else if (status == -1)
+      {
+        throw new Exception("Fail assigning ingredients to the recipe");
+      }
+      else {
+        CreateRecipeResponse.Builder response = CreateRecipeResponse.newBuilder().setStatus("SUCCESS. Recipe created");
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+      }
+    }
+    catch (Exception e) {
+      responseObserver.onError(e);
+    }
   }
 
   @Override
@@ -56,10 +74,61 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
 
         recipeBuilder.setImageLink(recipe.getImageLink() == null || recipe.getImageLink().isEmpty() ? "" : recipe.getImageLink());
 
+        for (int i = 0; i < recipe.getIngredients().size(); i++)
+        {
+          recipeBuilder.addIngredientsId(recipe.getIngredients().get(i).getId());
+        }
+
         response.addRecipes(recipeBuilder.build());
       }
     }
     responseObserver.onNext(response.build());
     responseObserver.onCompleted();
+  }
+
+  @Override
+  public void updateRecipe(UpdateRecipeRequest request,
+      StreamObserver<UpdateRecipeResponse> responseObserver) {
+    try {
+      int status = recipeDao.update(request);
+      if (status == 0) {
+        throw new Exception("FAIL: Could not update the recipe itself, without the ingredients");
+      }
+      else if (status == -1)
+      {
+        throw new Exception("FAIL: Could not update the ingredients of the recipe");
+      }
+      else {
+        UpdateRecipeResponse.Builder response = UpdateRecipeResponse.newBuilder().setStatus("SUCCESS updating the recipe");
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+      }
+    }
+    catch (Exception e) {
+      responseObserver.onError(e);
+    }
+  }
+
+  @Override
+  public void deleteRecipe(DeleteRecipeRequest request,
+      StreamObserver<DeleteRecipeResponse> responseObserver) {
+    try {
+      int status = recipeDao.delete(request);
+      if (status == 0) {
+        throw new Exception("FAIL: Could not delete the recipe itself");
+      }
+      else if (status == -1)
+      {
+        throw new Exception("FAIL: Could not delete the ingredients of the recipe");
+      }
+      else {
+        DeleteRecipeResponse.Builder response = DeleteRecipeResponse.newBuilder().setStatus("SUCCESS deleting the recipe");
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+      }
+    }
+    catch (Exception e) {
+      responseObserver.onError(e);
+    }
   }
 }
