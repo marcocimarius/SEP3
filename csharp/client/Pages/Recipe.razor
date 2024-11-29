@@ -89,7 +89,7 @@
         <div class="flex justify-end space-x-4">
             @if (IsError)
             {
-                <p style="color: red; margin-right: auto; font-size: x-small;">Please fill in all fields.</p>
+                <p style="color: red; margin-right: auto; font-size: small;">Please fill in all fields.</p>
             }
             <button type="button" @onclick="AddIngredient"
                     class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
@@ -111,6 +111,9 @@
             <button type="button" @onclick="CancelRecipe" class="text-gray-500 hover:text-gray-700">
                 &times;
             </button>
+            <!-- Add the placeholder/field for upload image -->
+            
+            
         </div>
         <!-- Add fields for new recipe here -->
         <div class="flex justify-end space-x-4">
@@ -127,7 +130,7 @@
 </dialog>
 
 <!-- Error Dialog -->
-<dialog id="errorDialog" class="rounded-lg p-6 bg-white shadow-lg w-1/3">
+<dialog id="errorDialog" class="rounded-lg p-4 bg-white shadow-lg w-1/4">
     <div class="flex flex-col space-y-4">
         <div class="flex justify-between items-center">
             <h3 class="text-xl font-bold">Error</h3>
@@ -180,7 +183,7 @@
     // Ingredient properties and methods
     private string IngredientName { get; set; } = string.Empty;
     private string IngredientType { get; set; } = string.Empty;
-    private int IngredientCalories { get; set; }
+    private int IngredientCalories { get; set; } 
     private bool IsAllergen { get; set; }
 
     private Dictionary<string, bool> FieldErrors = new()
@@ -215,13 +218,13 @@
         await Js.InvokeVoidAsync("showDialog", "errorDialog");
     }
 
-    private void AddIngredient()
+    private async void AddIngredient() // Ensure this method is correctly defined
     {
         ValidateFields();
         if (!IsError)
         {
-            HideNewIngredientDialog();
-            Js.InvokeVoidAsync("console.log", $"Ingredient Name: {IngredientName}, Type: {IngredientType}, Calories: {IngredientCalories}, Is Allergen: {IsAllergen}");
+            await HideNewIngredientDialog();
+            await Js.InvokeVoidAsync("console.log", $"Ingredient Name: {IngredientName}, Type: {IngredientType}, Calories: {IngredientCalories}, Is Allergen: {IsAllergen}");
             SuccessMessage();
         }
     }
