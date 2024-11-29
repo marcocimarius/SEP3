@@ -2,6 +2,9 @@ package via.dk.service;
 
 import io.grpc.stub.StreamObserver;
 import via.dk.*;
+import via.dk.dao.*;
+import via.dk.model.auth.CustomerInformation;
+import via.dk.model.auth.ICustomerInformation;
 import via.dk.dao.auth.ILoginDao;
 import via.dk.dao.auth.LoginDaoImpl;
 import via.dk.dao.auth.RegistrationDaoImpl;
@@ -12,10 +15,12 @@ import via.dk.dao.auth.IRegistrationDao;
 public class RegistrationServiceImpl extends RegistrationServiceGrpc.RegistrationServiceImplBase {
 	private final IRegistrationDao registrationDao;
 	private final ILoginDao loginDao;
+	private final ICustomerInformationDao customerInformationDao;
 
 	public RegistrationServiceImpl() {
 		registrationDao = new RegistrationDaoImpl();
 		loginDao = new LoginDaoImpl();
+		customerInformationDao = new CustomerInformationDaoImpl();
 	}
 
 	@Override
@@ -53,6 +58,23 @@ public class RegistrationServiceImpl extends RegistrationServiceGrpc.Registratio
 				.setPassword(reg.getPassword())
 				.setIsAdmin(reg.getIsAdmin())
 				.build();
+		responseObserver.onNext(response);
+		responseObserver.onCompleted();
+	}
+
+	@Override
+	public void createCustomerInformation(CreateCustomerInformationRequest request, StreamObserver<CreateCustomerInformationResponse> responseObserver) {
+		ICustomerInformation ci = new CustomerInformation(request.getUserId(), request.getFirstName(), request.getLastName(), request.getPhone(), request.getStreetName(), "", request.getCityName(), request.getPostNumber(), request.getCountryName());
+		try {
+			int result = customerInformationDao.create(ci);
+			if (result == 0) {
+				throw new Exception("FAIL: Customer information creation failed");
+			}
+		} catch (Exception e) {
+			responseObserver.onError(e);
+			return;
+		}
+		CreateCustomerInformationResponse response = CreateCustomerInformationResponse.newBuilder().setStatus("SUCCESS: Customer information creation successful").build();
 		responseObserver.onNext(response);
 		responseObserver.onCompleted();
 	}
