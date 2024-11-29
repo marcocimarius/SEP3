@@ -29,7 +29,6 @@ public class RecipesClient
     
     public async Task<IEnumerable<Recipe>> GetAllRecipes()
     {
-        var response = await this._recipeClient.GetAllRecipesAsync(new RetrieveRecipeRequest());
-        return response.Recipes;
+        return (await this._recipeClient.GetAllRecipesAsync(new RetrieveRecipeRequest())).Recipes;
     }
 }

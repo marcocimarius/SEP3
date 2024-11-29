@@ -2,12 +2,12 @@ package via.dk.service;
 
 import io.grpc.stub.StreamObserver;
 import via.dk.*;
-import via.dk.dao.ILoginDao;
-import via.dk.dao.LoginDaoImpl;
-import via.dk.dao.RegistrationDaoImpl;
+import via.dk.dao.auth.ILoginDao;
+import via.dk.dao.auth.LoginDaoImpl;
+import via.dk.dao.auth.RegistrationDaoImpl;
 import via.dk.model.auth.Login;
 import via.dk.model.auth.Registration;
-import via.dk.dao.IRegistrationDao;
+import via.dk.dao.auth.IRegistrationDao;
 
 public class RegistrationServiceImpl extends RegistrationServiceGrpc.RegistrationServiceImplBase {
 	private final IRegistrationDao registrationDao;

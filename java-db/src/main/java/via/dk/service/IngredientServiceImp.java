@@ -118,7 +118,7 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
     try {
       ingredients = ingredientsDao.getAllIngredients();
       //might be wrong to throw an exception if there is nothing
-      if (ingredients == null) throw new Exception("FAIL: There are no recipes");
+      if (ingredients.isEmpty()) throw new Exception("FAIL: There are no recipes");
     }
     catch (Exception e) {
       responseObserver.onError(e);

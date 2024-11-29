@@ -1,4 +1,4 @@
-package via.dk.dao;
+package via.dk.dao.auth;
 
 import via.dk.model.auth.ILogin;
 import via.dk.model.auth.Login;

@@ -10,6 +10,7 @@ public class GrpcClient
     
     public RecipesClient RecipesClient { get; }
     public IngredientsClient IngredientsClient { get; }
+    public AdminWeekSelectionClient AdminWeekSelectionClient { get; }
     
     public GrpcClient()
     {
@@ -18,6 +19,7 @@ public class GrpcClient
         
         this.RecipesClient = new RecipesClient(channel);
         this.IngredientsClient = new IngredientsClient(channel);
+        this.AdminWeekSelectionClient = new AdminWeekSelectionClient(channel);
     }
     
     public async Task<string> CreateRegistration(String email, String password, bool isAdmin)
