@@ -18,5 +18,6 @@
         <Protobuf Include="..\..\proto\registration.proto" GrpcServices="Client" />
         <Protobuf Include="..\..\proto\recipes.proto" GrpcServices="Client" />
         <Protobuf Include="..\..\proto\ingredients.proto" GrpcServices="Client" />
+        <Protobuf Include="..\..\proto\adminWeekSelection.proto" GrpcServices="Client" />
     </ItemGroup>
 </Project>

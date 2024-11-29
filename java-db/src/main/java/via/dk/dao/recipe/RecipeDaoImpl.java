@@ -1,11 +1,8 @@
 package via.dk.dao.recipe;
 
-import via.dk.CreateRecipeRequest;
-import via.dk.DeleteRecipeRequest;
-import via.dk.UpdateRecipeRequest;
-import via.dk.model.ingredient.IngredientModel;
-import via.dk.model.recipe.Recipe;
+import via.dk.*;
 import via.dk.util.DatabaseConnection;
+import via.dk.util.TimeConverter;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -58,7 +55,7 @@ public class RecipeDaoImpl implements IRecipeDao
     ResultSet resultSet = statement.executeQuery();
     List<Recipe> recipes = new ArrayList<>();
 
-    if (!resultSet.wasNull()) {
+    try {
       while (resultSet.next()) {
         int recipeId = resultSet.getInt("id");
         PreparedStatement recipeStatement = db.prepareStatement("""
@@ -71,22 +68,32 @@ public class RecipeDaoImpl implements IRecipeDao
           order by id
           """);
 
-        List<IngredientModel> ingredients = new ArrayList<>();
+        List<Ingredient> ingredients = new ArrayList<>();
         recipeStatement.setInt(1, recipeId);
         ResultSet ingredientsResultSet = recipeStatement.executeQuery();
+        //        if (!ingredientsResultSet.wasNull()) {
         while (ingredientsResultSet.next()) {
-          if (!ingredientsResultSet.wasNull()) {
-            int id = ingredientsResultSet.getInt("id");
-            String name = ingredientsResultSet.getString("name");
-            int calories = ingredientsResultSet.getInt("calories");
-            boolean isAllergen = ingredientsResultSet.getBoolean("is_allergen");
-            Timestamp creationDate = ingredientsResultSet.getTimestamp("creation_date");
-            Timestamp modificationDate = ingredientsResultSet.getTimestamp("modification_date");
-            String type = ingredientsResultSet.getString("type");
-            ingredients.add(new IngredientModel(id, name, calories, isAllergen,
-                creationDate, modificationDate, type));
+          int id = ingredientsResultSet.getInt("id");
+          String name = ingredientsResultSet.getString("name");
+          int calories = ingredientsResultSet.getInt("calories");
+          boolean isAllergen = ingredientsResultSet.getBoolean("is_allergen");
+          Timestamp creationDate = ingredientsResultSet.getTimestamp("creation_date");
+          Timestamp modificationDate = ingredientsResultSet.getTimestamp("modification_date");
+          String type = ingredientsResultSet.getString("type");
+          Ingredient.Builder ingredient = Ingredient.newBuilder()
+              .setId(id)
+              .setName(name)
+              .setCalories(calories)
+              .setIsAllergen(isAllergen)
+              .setCreationDate(TimeConverter.toProtobufTimestamp(creationDate))
+              .setType(type);
+          if (TimeConverter.toProtobufTimestamp(modificationDate) != null) {
+            ingredient.setModificationDate(TimeConverter.toProtobufTimestamp(modificationDate));
           }
+          ingredient.build();
+          ingredients.add(ingredient.build());
         }
+        //        }
 
         String recipeName = resultSet.getString("name");
         String type = resultSet.getString("type");
@@ -95,8 +102,31 @@ public class RecipeDaoImpl implements IRecipeDao
         Timestamp creationDate = resultSet.getTimestamp("creation_date");
         Timestamp modificationDate = resultSet.getTimestamp("modification_date");
         String imageLink = resultSet.getString("image_link");
-        recipes.add(new Recipe(recipeId, recipeName, type, containsAllergen, calories, creationDate, modificationDate, imageLink, ingredients));
+        Recipe.Builder recipe = Recipe.newBuilder()
+            .setId(recipeId)
+            .setName(recipeName)
+            .setType(type)
+            .setContainsAllergen(containsAllergen)
+            .setCalories(calories)
+            .setCreationDate(TimeConverter.toProtobufTimestamp(creationDate))
+            .setImageLink(imageLink == null ? " " : imageLink)
+            .addAllIngredients(ingredients);
+        if (TimeConverter.toProtobufTimestamp(modificationDate) != null) {
+          recipe.setModificationDate(TimeConverter.toProtobufTimestamp(modificationDate));
+        }
+        recipe.build();
+        recipes.add(recipe.build());
       }
+    }
+    catch (SQLException e) {
+      System.err.println("SQL Exception " + e.getMessage());
+      e.printStackTrace();
+      throw e;
+    }
+    catch (Exception e) {
+      System.err.println("Exception " + e.getMessage());
+      e.printStackTrace();
+      throw e;
     }
 
     return recipes;

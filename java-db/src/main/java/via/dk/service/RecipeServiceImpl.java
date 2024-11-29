@@ -4,7 +4,6 @@ import io.grpc.stub.StreamObserver;
 import via.dk.*;
 import via.dk.dao.recipe.IRecipeDao;
 import via.dk.dao.recipe.RecipeDaoImpl;
-import via.dk.model.recipe.Recipe;
 import via.dk.util.TimeConverter;
 
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
     List<Recipe> recipes = new ArrayList<>();
     try {
       recipes = recipeDao.getAllRecipes();
-      if (recipes == null) {
+      if (recipes.isEmpty()) {
         //maybe the message structure should be restructured so that it supports a status message in case there are no recipes and then print this out on the site
         throw new Exception("FAIL: There are no recipes");
       }
@@ -64,20 +63,15 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
             .setId(recipe.getId())
             .setName(recipe.getName())
             .setType(recipe.getType())
-            .setContainsAllergen(recipe.isContainsAllergen())
+            .setContainsAllergen(recipe.getContainsAllergen())
             .setCalories(recipe.getCalories())
-            .setCreationDate(TimeConverter.toProtobufTimestamp(recipe.getCreationDate()));
+            .setCreationDate(recipe.getCreationDate());
 
-        if (recipe.getModificationDate() != null) {
-          recipeBuilder.setModificationDate(TimeConverter.toProtobufTimestamp(recipe.getModificationDate()));
+        if (recipe.hasModificationDate()) {
+          recipeBuilder.setModificationDate(recipe.getModificationDate());
         }
-
-        recipeBuilder.setImageLink(recipe.getImageLink() == null || recipe.getImageLink().isEmpty() ? "" : recipe.getImageLink());
-
-        for (int i = 0; i < recipe.getIngredients().size(); i++)
-        {
-          recipeBuilder.addIngredientsId(recipe.getIngredients().get(i).getId());
-        }
+        recipeBuilder.setImageLink(recipe.getImageLink());
+        recipeBuilder.addAllIngredients(recipe.getIngredientsList());
 
         response.addRecipes(recipeBuilder.build());
       }

@@ -7,19 +7,21 @@ namespace grpc;
 public class GrpcClient
 {
     private readonly RegistrationService.RegistrationServiceClient _client;
-
+    
     public RecipesClient RecipesClient { get; }
     public IngredientsClient IngredientsClient { get; }
+    public AdminWeekSelectionClient AdminWeekSelectionClient { get; }
 
     public GrpcClient()
     {
         var channel = GrpcChannel.ForAddress("http://localhost:8181");
         this._client = new RegistrationService.RegistrationServiceClient(channel);
-
+        
         this.RecipesClient = new RecipesClient(channel);
         this.IngredientsClient = new IngredientsClient(channel);
+        this.AdminWeekSelectionClient = new AdminWeekSelectionClient(channel);
     }
-
+    
     public async Task<string> CreateRegistration(String email, String password, bool isAdmin)
     {
         var request = new CreateRegistrationRequest()
@@ -29,7 +31,7 @@ public class GrpcClient
             IsAdmin = isAdmin
         };
         var response = await this._client.CreateRegistrationAsync(request);
-        return response.Status;
+        return response.Status;     
     }
 
     public async Task<string> CreateCustomerInformation(int userId, String firstName, String lastName, String country, String city,
@@ -67,7 +69,6 @@ public class GrpcClient
         {
             Console.WriteLine(e);
         }
-
         return response;
     }
 }
