@@ -1,7 +1,8 @@
-@using DefaultNamespace
-@using Microsoft.AspNetCore.Components
-@inject ButtonStateService buttonService
-<div class="rounded overflow-hidden shadow-lg">
+@using BlazorApp1.Pages
+@using Recipe = Via.Dk.Recipe
+<div tabindex="@GetTabIndex()" aria-label="@GetLabel()"
+     class="rounded overflow-hidden shadow-lg @SelectedClass @GetSelectableClasses()"
+     onclick="@OnSelect">
     <img class="w-full" src="@ImageUrl" alt="Sunset in the mountains">
     <div class="px-6 py-4">
         <div class="font-bold text-xl mb-3">@Title</div>
@@ -10,9 +11,7 @@
             {
                 <span class="first-of-type:hidden">•</span>
                 <li
-                    class="">
-                    @ing
-                </li>
+                    class="">@ing</li>
             }
         </ul>
         <hr class="border-gray-200 mb-3"/>
@@ -21,22 +20,17 @@
             @foreach (string type in Types)
             {
                 <span
-                    class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
-                    @type
-                </span>
+                    class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">@type</span>
             }
         </div>
         @if (Editable)
         {
             <div class="flex justify-end gap-2 w-full">
-                <button class="bg-yellow-500 font-normal text-sm hover:bg-yellow-600 text-white py-2 px-4 rounded">Edit</button>
-                <button class="bg-red-600 font-normal text-sm hover:bg-red-600 text-white py-2 px-4 rounded">Delete</button>
-            </div>
-        }
-        @if (Selectable)
-        { 
-            <div>
-                <button id="select" @onclick="OnButtonClicked" class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Pick</button>
+                <button class="bg-yellow-500 font-normal text-sm hover:bg-yellow-600 text-white py-2 px-4 rounded">
+                    Edit
+                </button>
+                <button class="bg-red-600 font-normal text-sm hover:bg-red-600 text-white py-2 px-4 rounded">Delete
+                </button>
             </div>
         }
     </div>
@@ -47,22 +41,61 @@
 
 
 {
+
+    [Parameter] public int Id { get; set; }
     [Parameter] public string Title { get; set; } = "Spaghetti bolognese";
     [Parameter] public string Description { get; set; } = "Test description";
     [Parameter] public string ImageUrl { get; set; } = "https://placehold.co/600x400";
     [Parameter] public bool Editable { get; set; } = false;
-    [Parameter] public bool Selectable { get; set; } = false;
     [Parameter] public IReadOnlyList<string> Types { get; set; }
     [Parameter] public IReadOnlyList<string> Ingredients { get; set; }
-    
-    public void OnButtonClicked()
+    [Parameter] public EventCallback<string> OnSelected { get; set; }
+    [Parameter] public bool Selectable { get; set; } = false;
+    private bool IsSelected { get; set; }
+    private string SelectedClass { get; set; }
+
+    private int GetTabIndex()
     {
-        buttonService.SetButtonClicked();
+        return Selectable ? 0 : -1;
     }
 
-    public string GiveTitle()
+    private string GetLabel()
     {
-        return Title;
+        return Selectable ? "Select recipe " + Title : "";
+    }
+
+    private string GetSelectableClasses()
+    {
+        return Selectable ? "cursor-pointer" : "";
+    }
+
+    private void ToggleSelected()
+    {
+        if (!Selectable)
+        {
+            return;
+        }
+
+        if (!IsSelected)
+        {
+            SelectedClass = "bg-green-100 border border-green-500";
+            IsSelected = true;
+            return;
+        }
+
+        SelectedClass = "";
+        IsSelected = false;
+    }
+
+    private void OnSelect()
+    {
+        ToggleSelected();
+        if (IsSelected)
+        {
+            OnSelected.InvokeAsync(Id.ToString());
+            return;
+        }
+
+        OnSelected.InvokeAsync(null);
     }
 }
-

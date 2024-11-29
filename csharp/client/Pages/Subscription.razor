@@ -1,0 +1,53 @@
+@page "/subscription"
+
+<AuthorizeView Roles="User">
+    <Authorized>
+
+        <div class="max-w-screen-md mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">Subscription Status</h1>
+
+            @if (isSubscribed)
+            {
+                <div class="p-4 bg-green-100 text-green-700 rounded-md mb-4">
+                    <p class="font-medium">You are currently subscribed! 🎉</p>
+                    <p class="text-sm">Thank you for being a valued subscriber. Enjoy the benefits of our service!</p>
+                </div>
+                <p>Start date: 2024/12/04</p>
+            }
+            else
+            {
+                <div class="p-4 bg-red-100 text-red-700 rounded-md mb-6">
+                    <p class="font-medium">You are not subscribed. 😔</p>
+                    <p class="text-sm">Subscribe now to unlock all features and enjoy premium benefits.</p>
+                </div>
+                <button @onclick="SubscribeAsync"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
+                    Subscribe Now
+                </button>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="max-w-screen-md mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">Access Denied</h1>
+            <p class="text-gray-600">Please log in to view your subscription status.</p>
+            <a href="/login"
+               class="mt-4 inline-block bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-700">
+                Login
+            </a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    private bool isSubscribed = false; // Replace this with your logic to determine subscription status
+
+    private async Task SubscribeAsync()
+    {
+        // Replace with your subscription logic
+        isSubscribed = true;
+        Console.WriteLine("User has subscribed.");
+    }
+
+}

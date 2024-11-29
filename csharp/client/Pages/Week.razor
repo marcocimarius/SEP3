@@ -1,0 +1,54 @@
+@page "/week"
+@using BlazorApp1.Components
+
+<AuthorizeView Roles="User">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Weeks</h1>
+    <input type="week"
+           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+           @bind="CurrentWeek"
+    />
+    <button onclick="@OnSubmit" class="btn">
+        Submit
+    </button>
+    <div class="flex gap-4">
+        <RecipeCard
+            ImageUrl="assets/spaghetti-bolog.jpg"
+            Title="Spaghetti bolognese"
+            Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+            Types="types"
+            Ingredients="ingredients"
+            Selectable="true"
+            Id="1"
+            OnSelected="(s) => Console.WriteLine(s)"
+        />
+        <RecipeCard
+            ImageUrl="assets/spaghetti-bolog.jpg"
+            Title="Spaghetti bolognese"
+            Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+            Types="types"
+            Ingredients="ingredients"
+            Selectable="true"
+            Id="2"
+        />
+        <RecipeCard
+            ImageUrl="assets/spaghetti-bolog.jpg"
+            Title="Spaghetti bolognese"
+            Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+            Types="types"
+            Ingredients="ingredients"
+            Id="3"
+        />
+    </div>
+</AuthorizeView>
+
+
+@code {
+    public string CurrentWeek { get; set; }
+    List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
+    List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
+
+    public void OnSubmit()
+    {
+        Console.WriteLine(CurrentWeek);
+    }
+}
