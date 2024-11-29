@@ -1,4 +1,8 @@
-<div class="relative rounded overflow-hidden shadow-lg">
+@using BlazorApp1.Pages
+@using Recipe = Via.Dk.Recipe
+<div tabindex="@GetTabIndex()" aria-label="@GetLabel()"
+     class="relative rounded overflow-hidden shadow-lg @SelectedClass @GetSelectableClasses()"
+     onclick="@OnSelect">
     @if(Editable){
     <div class="absolute top-2 right-2 flex gap-2 z-10 justify-end">
         <button class="bg-white font-normal text-sm hover:bg-yellow-300 text-black py-2 px-4 rounded">
@@ -45,6 +49,8 @@
 
 
 {
+
+    [Parameter] public int Id { get; set; }
     [Parameter] public string Title { get; set; } = "Spaghetti bolognese";
     [Parameter] public string Description { get; set; } = "Test description";
     [Parameter] public string ImageUrl { get; set; } = "https://placehold.co/600x400";
@@ -52,5 +58,53 @@
     [Parameter] public IReadOnlyList<string> Types { get; set; }
     [Parameter] public IReadOnlyList<string> Ingredients { get; set; }
     [Parameter] public IReadOnlyList<string> Allergens { get; set; }
+    [Parameter] public EventCallback<string> OnSelected { get; set; }
+    [Parameter] public bool Selectable { get; set; } = false;
+    private bool IsSelected { get; set; }
+    private string SelectedClass { get; set; }
 
+    private int GetTabIndex()
+    {
+        return Selectable ? 0 : -1;
+    }
+
+    private string GetLabel()
+    {
+        return Selectable ? "Select recipe " + Title : "";
+    }
+
+    private string GetSelectableClasses()
+    {
+        return Selectable ? "cursor-pointer" : "";
+    }
+
+    private void ToggleSelected()
+    {
+        if (!Selectable)
+        {
+            return;
+        }
+
+        if (!IsSelected)
+        {
+            SelectedClass = "bg-green-100 border border-green-500";
+            IsSelected = true;
+            return;
+        }
+
+        SelectedClass = "";
+        IsSelected = false;
+    }
+
+    private void OnSelect()
+    {
+        ToggleSelected();
+        if (IsSelected)
+        {
+            OnSelected.InvokeAsync(Id.ToString());
+            return;
+        }
+
+        OnSelected.InvokeAsync(null);
+    }
 }

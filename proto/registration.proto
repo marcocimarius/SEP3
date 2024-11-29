@@ -4,15 +4,44 @@ option java_multiple_files = true;
 package via.dk;
 
 message CreateRegistrationRequest{
-    string email = 1;
-    string password = 2;
-    bool isAdmin = 3;
+  string email = 1;
+  string password = 2;
+  bool isAdmin = 3;
 }
 
 message CreateRegistrationResponse{
-    string status = 1;
+  string status = 1;
+}
+
+message LoginRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse{
+  int32 id = 1;
+  string email = 2;
+  string password = 3;
+  bool isAdmin = 4;
 }
 
 service RegistrationService {
-    rpc CreateRegistration(CreateRegistrationRequest) returns (CreateRegistrationResponse);
+  rpc CreateRegistration(CreateRegistrationRequest) returns (CreateRegistrationResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc CreateCustomerInformation(CreateCustomerInformationRequest) returns (CreateCustomerInformationResponse);
+}
+
+message CreateCustomerInformationRequest{
+  string firstName = 1;
+  string lastName = 2;
+  string phone = 3;
+  string streetName = 4;
+  string cityName = 5;
+  string postNumber = 6;
+  string countryName = 7;
+  int32 userId = 8;
+}
+
+message CreateCustomerInformationResponse{
+  string status = 1;
 }

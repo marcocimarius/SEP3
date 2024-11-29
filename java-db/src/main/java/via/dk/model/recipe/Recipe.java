@@ -1,20 +1,24 @@
 package via.dk.model.recipe;
 
+import via.dk.model.ingredient.IngredientModel;
+
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Recipe
 {
   private Integer id;
   private String name;
   private String type;
-  private boolean containsAllergen;
+  private final boolean containsAllergen;
   private int calories;
-  private Timestamp creationDate;
-  private Timestamp modificationDate;
-  private String imageLink;
+  private final Timestamp creationDate;
+  private final Timestamp modificationDate;
+  private final String imageLink;
+  private final List<IngredientModel> ingredients;
 
   public Recipe(int id, String name, String type, boolean containsAllergen,
-      int calories, Timestamp creationDate, Timestamp modificationDate, String imageLink)
+      int calories, Timestamp creationDate, Timestamp modificationDate, String imageLink, List<IngredientModel> ingredients)
   {
     this.id = id;
     this.name = name;
@@ -24,6 +28,7 @@ public class Recipe
     this.creationDate = creationDate;
     this.modificationDate = modificationDate;
     this.imageLink = imageLink;
+    this.ingredients = ingredients;
   }
 
   public Integer getId()
@@ -39,11 +44,6 @@ public class Recipe
   public String getImageLink()
   {
     return imageLink;
-  }
-
-  public void setImageLink(String imageLink)
-  {
-    this.imageLink = imageLink;
   }
 
   public String getName()
@@ -71,11 +71,6 @@ public class Recipe
     return containsAllergen;
   }
 
-  public void setContainsAllergen(boolean containsAllergen)
-  {
-    this.containsAllergen = containsAllergen;
-  }
-
   public int getCalories()
   {
     return calories;
@@ -91,18 +86,13 @@ public class Recipe
     return creationDate;
   }
 
-  public void setCreationDate(Timestamp creationDate)
-  {
-    this.creationDate = creationDate;
-  }
-
   public Timestamp getModificationDate()
   {
     return modificationDate;
   }
 
-  public void setModificationDate(Timestamp modificationDate)
+  public List<IngredientModel> getIngredients()
   {
-    this.modificationDate = modificationDate;
+    return ingredients;
   }
 }

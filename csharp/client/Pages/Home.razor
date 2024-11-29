@@ -1,5 +1,19 @@
 ﻿@page "/"
+@using System.Security.Claims
 
 <pagetitle>ByeByeRotten</pagetitle>
-
 <h1>This is our homepage</h1>
+<AuthorizeView>
+    <Authorized>
+        You are:
+        @foreach (Claim claim in context.User.Claims)
+        {
+            <li>
+                @claim.Type - @claim.Value
+            </li>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <NavLink href="login">Login</NavLink>
+    </NotAuthorized>
+</AuthorizeView>

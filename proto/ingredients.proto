@@ -11,6 +11,7 @@ message Ingredient {
   bool is_allergen = 4;
   google.protobuf.Timestamp creation_date = 5;
   google.protobuf.Timestamp modification_date = 6;
+  string type = 7;
 }
 
 message UpdateIngredientRequest {
@@ -18,6 +19,7 @@ message UpdateIngredientRequest {
   string name = 2;
   int32 calories = 3;
   bool is_allergen = 4;
+  int32 type_id = 5;
 }
 
 message UpdateIngredientResponse {
@@ -28,6 +30,7 @@ message CreateIngredientRequest {
   string name = 1;
   int32 calories = 2;
   bool contains_allergens = 3;
+  int32 type_id = 4;
 }
 
 message CreateIngredientResponse {
