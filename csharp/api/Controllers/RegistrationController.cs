@@ -15,14 +15,14 @@ public class RegistrationController(GrpcClient grpcService) : ControllerBase
     public async Task<ActionResult<string>> Post([FromBody] CreateRegistrationRequest req)
     {
         string hashed = PasswordService.Hash(req.Password);
-        return await grpcService.CreateRegistration(req.Email, hashed, req.IsAdmin);
+        return await grpcService.RegistrationClient.CreateRegistration(req.Email, hashed, req.IsAdmin);
     }
 
     [HttpPost]
     [Route("login")]
     public async Task<ActionResult<ApiLoginResponse>> Login([FromBody] LoginRequest req)
     {
-        LoginResponse? res = await grpcService.Login(req.Email, req.Password);
+        LoginResponse? res = await grpcService.RegistrationClient.Login(req.Email, req.Password);
         if (res == null) return NotFound();
         ApiLoginResponse apiRes = new ApiLoginResponse
         {
@@ -52,7 +52,7 @@ public class RegistrationController(GrpcClient grpcService) : ControllerBase
         string? result = null;
         try
         {
-            result = await grpcService.CreateCustomerInformation(req.UserId, req.FirstName, req.LastName, req.CountryName, req.CityName, req.StreetName, req.PostNumber, req.Phone);
+            result = await grpcService.RegistrationClient.CreateCustomerInformation(req.UserId, req.FirstName, req.LastName, req.CountryName, req.CityName, req.StreetName, req.PostNumber, req.Phone);
         }
         catch (Exception e)
         {
