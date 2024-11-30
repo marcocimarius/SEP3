@@ -1,0 +1,189 @@
+﻿@page "/register"
+@using BlazorApp1.Providers
+@using Via.Dk
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager navMgr
+@inject AuthenticationStateProvider authProvider;
+
+<PageTitle>Registration</PageTitle>
+
+<div class="max-w-screen-xl mx-auto">
+    <h1 class="font-bold text-3xl pt-4 pb-3">Login information</h1>
+    <div class="flex-col max-w-screen-xl justify-start items-start">
+        <div class="flex space-x-4">
+            <div class="w-1/2">
+                <label for="firstName" class="block mb-2 text-sm font-medium text-gray-900">Email *</label>
+                <input type="text" @bind="Email" id="email"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                       placeholder="johndoe@@gmail.com"
+                       style="@(FieldErrors["email"] ? "border-color: red; color: red;" : "")"/>
+            </div>
+            <div class="w-1/2">
+                <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password *</label>
+                <input type="password" @bind="Password" id="password"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                       style="@(FieldErrors["password"] ? "border-color: red;" : "")"/>
+            </div>
+        </div>
+        <h1 class="font-bold text-3xl pt-4 pb-3">Customer information</h1>
+        <div class="flex-col max-w-screen-xl justify-start items-start">
+            <div class="flex space-x-4">
+                <div class="w-1/2">
+                    <label for="firstName" class="block mb-2 text-sm font-medium text-gray-900">First name *</label>
+                    <input type="text" @bind="FirstName" id="firstName"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                           placeholder="Michael"
+                           style="@(FieldErrors["firstName"] ? "border-color: red; color: red;" : "")"/>
+                </div>
+                <div class="w-1/2">
+                    <label for="lastName" class="block mb-2 text-sm font-medium text-gray-900">Last name *</label>
+                    <input type="text" @bind="LastName" id="lastName"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                           placeholder="Nielsen" style="@(FieldErrors["lastName"] ? "border-color: red;" : "")"/>
+                </div>
+            </div>
+            <div class="flex space-x-4">
+                <div class="w-1/2">
+                    <label for="phone" class="block mb-2 text-sm font-medium text-gray-900">Phone *</label>
+                    <input type="text" @bind="Phone" id="phone"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                           placeholder="+4512312322"
+                           style="@(FieldErrors["phone"] ? "border-color: red; color: red;" : "")"/>
+                </div>
+            </div>
+            <h1 class="font-bold text-3xl pt-4 pb-3">Delivery</h1>
+            <div class="flex space-x-4">
+                <div class="w-1/2">
+                    <label for="country" class="block mb-2 text-sm font-medium text-gray-900">Country *</label>
+                    <input type="text" @bind="Country" id="country"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                           placeholder="Denmark" style="@(FieldErrors["country"] ? "border-color: red;" : "")"/>
+                </div>
+                <div class="w-1/2">
+                    <label for="city" class="block mb-2 text-sm font-medium text-gray-900">City *</label>
+                    <input type="text" @bind="City" id="city"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                           placeholder="Horsens" style="@(FieldErrors["city"] ? "border-color: red;" : "")"/>
+                </div>
+            </div>
+            <div class="flex space-x-4 pt-2">
+                <div class="w-1/2">
+                    <label for="street" class="block mb-2 text-sm font-medium text-gray-900">Street *</label>
+                    <input type="text" @bind="Street" id="street"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                           placeholder="Emil Møllers Gade, 90, 1.sal, th"
+                           style="@(FieldErrors["street"] ? "border-color: red;" : "color: gray;")"/>
+                </div>
+                <div class="w-1/2">
+                    <label for="zipCode" class="block mb-2 text-sm font-medium text-gray-900">Zip code *</label>
+                    <input type="text" @bind="ZipCode" id="zipCode"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+                           placeholder="8700" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                           style="@(FieldErrors["zipCode"] ? "border-color: red;" : "")"/>
+                </div>
+            </div>
+            <div class="py-2 flex justify-end items-center">
+                <p style="color: gray; margin-right: auto; font-size: small">* required fields</p>
+                @if (IsError)
+                {
+                    <p style="color: red; margin-right: 15px">Please fill in all required fields.</p>
+                }
+                <button @onclick="FetchDataRegister"
+                        class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
+                    Register
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? Email { get; set; } = string.Empty;
+    private string? Password { get; set; } = string.Empty;
+    private string FirstName { get; set; } = string.Empty;
+    private string LastName { get; set; } = string.Empty;
+    private string Phone { get; set; } = string.Empty;
+    private string Country { get; set; } = string.Empty;
+    private string City { get; set; } = string.Empty;
+    private string Street { get; set; } = string.Empty;
+    private string ZipCode { get; set; } = string.Empty;
+
+    private Dictionary<string, bool> FieldErrors = new()
+    {
+        { "email", false },
+        { "password", false },
+        { "firstName", false },
+        { "phone", false },
+        { "lastName", false },
+        { "country", false },
+        { "city", false },
+        { "street", false },
+        { "zipCode", false }
+    };
+
+    private bool IsError { get; set; } = false;
+
+    private void ValidateFields()
+    {
+        FieldErrors["firstName"] = string.IsNullOrWhiteSpace(FirstName);
+        FieldErrors["email"] = string.IsNullOrWhiteSpace(FirstName);
+        FieldErrors["password"] = string.IsNullOrWhiteSpace(FirstName);
+        FieldErrors["phone"] = string.IsNullOrWhiteSpace(Phone);
+        FieldErrors["lastName"] = string.IsNullOrWhiteSpace(LastName);
+        FieldErrors["country"] = string.IsNullOrWhiteSpace(Country);
+        FieldErrors["city"] = string.IsNullOrWhiteSpace(City);
+        FieldErrors["street"] = string.IsNullOrWhiteSpace(Street);
+        FieldErrors["zipCode"] = string.IsNullOrWhiteSpace(ZipCode) || ZipCode.Length != 4;
+
+        IsError = FieldErrors.Values.Any(v => v);
+    }
+
+    private async Task FetchDataRegister()
+    {
+        ValidateFields();
+        if (!IsError)
+        {
+            await JS.InvokeVoidAsync("console.log", $"First Name: {FirstName}, Last Name: {LastName}, Country: {Country}, City: {City}, Street: {Street}, Zip Code: {ZipCode}");
+        }
+
+        await RegisterUser();
+        var res2 = await CreateCustomerInformation();
+        if (res2.IsSuccessStatusCode)
+        {
+            navMgr.NavigateTo("/");
+        }
+    }
+
+    private async Task<HttpResponseMessage> CreateCustomerInformation()
+    {
+        var auth = await authProvider.GetAuthenticationStateAsync();
+
+        var userId = int.Parse(auth.User.Claims.First(c => String.Equals(c.Type, "Id")).Value);
+        CreateCustomerInformationRequest request = new CreateCustomerInformationRequest
+        {
+            UserId = userId,
+            FirstName = FirstName,
+            LastName = LastName,
+            Phone = Phone,
+            CountryName = Country,
+            CityName = City,
+            StreetName = Street,
+            PostNumber = ZipCode,
+        };
+        return await Http.PostAsJsonAsync("api/registration/customer-information", request);
+    }
+
+    private async Task RegisterUser()
+    {
+        CreateRegistrationRequest request = new CreateRegistrationRequest
+        {
+            Email = Email,
+            Password = Password,
+            IsAdmin = false
+        };
+        await Http.PostAsJsonAsync("api/registration", request);
+        await ((AuthProvider)authProvider).Login(Email, Password);
+    }
+
+}

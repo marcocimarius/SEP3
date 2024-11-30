@@ -19,6 +19,7 @@ public class IngredientsClient
 
     public async Task<string> DeleteIngredientAsync(DeleteIngredientRequest request)
     {
+        Console.WriteLine($"ingredient id: {request.Id}");
         return (await this._ingredientsClient.DeleteIngredientAsync(request)).Status;
     }
 

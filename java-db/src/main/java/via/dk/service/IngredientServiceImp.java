@@ -6,6 +6,7 @@ import via.dk.*;
 import via.dk.dao.ingredients.IIngredientsDao;
 import via.dk.dao.ingredients.IngredientsDaoImpl;
 import via.dk.model.ingredient.IngredientModel;
+
 import via.dk.util.TimeConverter;
 import via.dk.util.dtos.DeleteIngredientDto;
 
@@ -23,34 +24,16 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
     this.ingredientsDao = new IngredientsDaoImpl();
   }
 
-//  @Override
-//  public void createIngredient(CreateIngredientRequest request,
-//      StreamObserver<CreateIngredientResponse> responseObserver) throws
-//      SQLException
-//  {
-//      IngredientModel ingredient = new IngredientModel(null, request.getName(), request.getCalories(), request.getContainsAllergens(), null, null);
-//      try
-//      {
-//        int result = ingredientsDao.createIngredient(ingredient);
-//        if (result == 0) {
-//          throw new Exception("FAIL: Ingredient creation failed");
-//        }
-//      }
-//      catch (Exception e) {
-//        responseObserver.onError(e);
-//      }
-//      CreateIngredientResponse response = CreateIngredientResponse.newBuilder().setStatus("SUCCESS: Creation of ingredient successful").build();
-//      responseObserver.onNext(response);
-//      responseObserver.onCompleted();
-//  }
-
   @Override
   public void createIngredient(CreateIngredientRequest request,
       StreamObserver<CreateIngredientResponse> responseObserver) {
-    IngredientModel ingredient = new IngredientModel(null, request.getName(), request.getCalories(), request.getContainsAllergens(), null, null);
-    try {
-      int result = ingredientsDao.createIngredient(ingredient);
+    IngredientModel ingredient = new IngredientModel(null, request.getName(), request.getCalories(), request.getContainsAllergens(), null, null, null);
 
+    try {
+      int result = ingredientsDao.createIngredient(ingredient,
+          request.getTypeId());
+
+      //this is never gonna happen
       if (result == 0) {
         // If creation failed, throw an exception
         throw new SQLException("FAIL: Ingredient creation failed");
@@ -89,9 +72,11 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
     IngredientModel ingredient = new IngredientModel(request.getId(),
         request.getName(), request.getCalories(), request.getIsAllergen(),
         new Timestamp(System.currentTimeMillis()), //this is just a placeholder
-        new Timestamp(System.currentTimeMillis()));
+        new Timestamp(System.currentTimeMillis()),
+        " ");
     try {
-      int result = ingredientsDao.updateIngredient(ingredient);
+      int result = ingredientsDao.updateIngredient(ingredient,
+          request.getTypeId());
       if (result == 0) {
         throw new Exception("FAIL: Ingredient update failed");
       }
@@ -99,6 +84,7 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
     catch (Exception e) {
       responseObserver.onError(e);
       responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+      return;
     }
     UpdateIngredientResponse response = UpdateIngredientResponse.newBuilder().setStatus("SUCCESS: Update of ingredient successful").build();
     responseObserver.onNext(response);
@@ -118,6 +104,7 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
     }
     catch (Exception e) {
       responseObserver.onError(e);
+      return;
     }
     DeleteIngredientResponse response = DeleteIngredientResponse.newBuilder().setStatus("SUCCESS: Delete of ingredient successful").build();
     responseObserver.onNext(response);
@@ -144,7 +131,8 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
             .setName(ingredient.getName())
             .setCalories(ingredient.getCalories())
             .setIsAllergen(ingredient.isAllergen())
-            .setCreationDate(TimeConverter.toProtobufTimestamp(ingredient.getCreationDate()));
+            .setCreationDate(TimeConverter.toProtobufTimestamp(ingredient.getCreationDate()))
+            .setType(ingredient.getType());
 
         if (ingredient.getModificationDate() != null) {
           ingredientBuilder.setModificationDate(TimeConverter.toProtobufTimestamp(ingredient.getModificationDate()));

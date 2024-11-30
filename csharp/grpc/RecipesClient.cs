@@ -12,11 +12,21 @@ public class RecipesClient
         this._recipeClient = new RecipeService.RecipeServiceClient(channel);
     }
     
-    public async Task<string> CreateRecipe()
+    public async Task<string> CreateRecipe(CreateRecipeRequest createRecipeRequest)
     {
-        return "";
+        return (await this._recipeClient.CreateRecipeAsync(createRecipeRequest)).Status;
     }
-
+    
+    public async Task<string> UpdateRecipe(UpdateRecipeRequest updateRecipeRequest)
+    {
+        return (await this._recipeClient.UpdateRecipeAsync(updateRecipeRequest)).Status;
+    }
+    
+    public async Task<string> DeleteRecipe(DeleteRecipeRequest deleteRecipeRequest)
+    {
+        return (await this._recipeClient.DeleteRecipeAsync(deleteRecipeRequest)).Status;
+    }
+    
     public async Task<IEnumerable<Recipe>> GetAllRecipes()
     {
         var response = await this._recipeClient.GetAllRecipesAsync(new RetrieveRecipeRequest());
