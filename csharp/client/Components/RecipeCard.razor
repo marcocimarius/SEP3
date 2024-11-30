@@ -17,11 +17,8 @@
         <hr class="border-gray-200 mb-3"/>
         <p class="text-gray-700 text-base mb-3">@Description</p>
         <div class="flex gap-2 mb-3 flex-wrap">
-            @foreach (string type in Types)
-            {
                 <span
-                    class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">@type</span>
-            }
+                    class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">@Type</span>
         </div>
         @if (Editable)
         {
@@ -47,7 +44,7 @@
     [Parameter] public string Description { get; set; } = "Test description";
     [Parameter] public string ImageUrl { get; set; } = "https://placehold.co/600x400";
     [Parameter] public bool Editable { get; set; } = false;
-    [Parameter] public IReadOnlyList<string> Types { get; set; }
+    [Parameter] public string Type { get; set; }
     [Parameter] public IReadOnlyList<string> Ingredients { get; set; }
     [Parameter] public EventCallback<string> OnSelected { get; set; }
     [Parameter] public bool Selectable { get; set; } = false;

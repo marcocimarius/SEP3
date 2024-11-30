@@ -1,34 +1,59 @@
 @page "/recipes"
+@inject HttpClient httpClient;
 @using BlazorApp1.Components
 @attribute [Authorize]
 
 <pagetitle class="text-2xl font-bold">Recipes</pagetitle>
-<div class="flex gap-4">
-    <RecipeCard
-        ImageUrl="assets/spaghetti-bolog.jpg"
-        Title="Spaghetti bolognese"
-        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-        Types="types"
-        Ingredients="ingredients"
-        Editable="true"
-    />
-    <RecipeCard
-        ImageUrl="assets/spaghetti-bolog.jpg"
-        Title="Spaghetti bolognese"
-        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-        Types="types"
-        Ingredients="ingredients"
-    />
-    <RecipeCard
-        ImageUrl="assets/spaghetti-bolog.jpg"
-        Title="Spaghetti bolognese"
-        Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-        Types="types"
-        Ingredients="ingredients"
-    />
+<div class="grid grid-cols-3 justify-between gap-4">
+    @foreach(var recipe in recipes)
+    {
+        <RecipeCard
+            Id="recipe.Id"
+            ImageUrl="@recipe.ImageLink"
+            Title="@recipe.Name"
+            Type="@recipe.Type"
+            Ingredients="@recipe.Ingredients.Select(i => i.Name).ToList()"
+            Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+        />
+    }
+    @* <RecipeCard *@
+    @*     ImageUrl="assets/spaghetti-bolog.jpg" *@
+    @*     Title="Spaghetti bolognese" *@
+    @*     Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway." *@
+    @*     Types="types" *@
+    @*     Ingredients="ingredients" *@
+    @*     Editable="true"/> *@
+    @* <RecipeCard *@
+    @*     ImageUrl="assets/spaghetti-bolog.jpg" *@
+    @*     Title="Spaghetti bolognese" *@
+    @*     Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway." *@
+    @*     Types="types" *@
+    @*     Ingredients="ingredients"/> *@
+    @* <RecipeCard *@
+    @*     ImageUrl="assets/spaghetti-bolog.jpg" *@
+    @*     Title="Spaghetti bolognese" *@
+    @*     Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway." *@
+    @*     Types="types" *@
+    @*     Ingredients="ingredients"/> *@
 </div>
 
 @code {
     List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
     List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
+    List<Via.Dk.Recipe> recipes  = new List<Via.Dk.Recipe>();
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var newRecipes = await GetRecipes();
+            recipes.AddRange(newRecipes);
+            StateHasChanged();
+        }
+    }
+
+    private async Task<IEnumerable<Via.Dk.Recipe>> GetRecipes()
+    {
+        return await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Recipe>>("api/Recipe/allRecipes");
+    }
 }
