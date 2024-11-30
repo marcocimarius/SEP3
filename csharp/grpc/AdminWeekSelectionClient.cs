@@ -27,8 +27,8 @@ public class AdminWeekSelectionClient
         return (await _adminWeekSelectionServiceClient.UpdateAdminWeekSelectionAsync(request)).Status;
     }
 
-    public async Task<RetrieveAdminWeekSelectionResponse> GetAdminWeekRecipes()
+    public async Task<RetrieveAdminWeekSelectionResponse> GetAdminWeekRecipes(RetrieveAdminWeekSelectionRequest request)
     {
-        return (await this._adminWeekSelectionServiceClient.RetrieveAdminWeekSelectionAsync(new RetrieveAdminWeekSelectionRequest()));
+        return (await this._adminWeekSelectionServiceClient.RetrieveAdminWeekSelectionAsync(request));
     }
 }
