@@ -17,9 +17,14 @@ public class AdminWeekController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IResult> GetAll()
+    public async Task<IResult> GetAll([FromQuery] DateTime weekStartDate, [FromQuery] DateTime weekEndDate)
     {
-        List<AdminWeek> weeks = (await this._grpcService.AdminWeekSelectionClient.GetAdminWeekRecipes()).AdminWeeks.ToList();
+        var request = new RetrieveAdminWeekSelectionRequest()
+        {
+            WeekStartDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(weekStartDate.ToUniversalTime()),
+            WeekEndDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(weekEndDate.ToUniversalTime()),
+        };
+        List<AdminWeek> weeks = (await this._grpcService.AdminWeekSelectionClient.GetAdminWeekRecipes(request)).AdminWeeks.ToList();
         if (weeks.Count == 0)
         {
             return Results.NotFound();

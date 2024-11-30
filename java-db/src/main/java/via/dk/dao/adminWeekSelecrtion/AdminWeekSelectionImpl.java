@@ -142,19 +142,22 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
     return 1;
   }
 
-  @Override public List<AdminWeek> retrieveAdminWeekSelection() throws SQLException
+  @Override public List<AdminWeek> retrieveAdminWeekSelection(RetrieveAdminWeekSelectionRequest request) throws SQLException
   {
     List<AdminWeek> adminWeekSelections = new ArrayList<>();
     List<Recipe> recipes = new ArrayList<>();
     List<Ingredient> ingredients = new ArrayList<>();
 
     PreparedStatement statement = db.prepareStatement("""
-        select * from admin_week
+        select * from admin_week \s
+        where week_start_date = ? and week_end_date = ?
         """);
+    statement.setTimestamp(1, TimeConverter.toJavaTimestamp(request.getWeekStartDate()));
+    statement.setTimestamp(2, TimeConverter.toJavaTimestamp(request.getWeekEndDate()));
     ResultSet resultSet = statement.executeQuery();
 
     try {
-      while (resultSet.next()) {
+      if (resultSet.next()) {
         int adminWeekId = resultSet.getInt("id");
         Timestamp weekStartDate = resultSet.getTimestamp("week_start_date");
         Timestamp weekEndDate = resultSet.getTimestamp("week_end_date");

@@ -86,7 +86,7 @@ public class AdminWeekSelectionServiceImpl extends AdminWeekSelectionServiceGrpc
   public void retrieveAdminWeekSelection(RetrieveAdminWeekSelectionRequest request,
       StreamObserver<RetrieveAdminWeekSelectionResponse> responseObserver) {
     try {
-      List<AdminWeek> adminWeeks = this.adminWeekSelectionDao.retrieveAdminWeekSelection();
+      List<AdminWeek> adminWeeks = this.adminWeekSelectionDao.retrieveAdminWeekSelection(request);
       RetrieveAdminWeekSelectionResponse.Builder response = RetrieveAdminWeekSelectionResponse.newBuilder()
           .addAllAdminWeeks(adminWeeks);
       responseObserver.onNext(response.build());
