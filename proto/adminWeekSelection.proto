@@ -37,7 +37,8 @@ message UpdateAdminWeekSelectionResponse {
 }
 
 message RetrieveAdminWeekSelectionRequest {
-  
+  google.protobuf.Timestamp week_start_date = 1;
+  google.protobuf.Timestamp week_end_date = 2;
 }
 
 message AdminWeek {
