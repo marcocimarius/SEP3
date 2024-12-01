@@ -1,6 +1,7 @@
 ﻿syntax = "proto3";
 option java_multiple_files = true;
 import "google/protobuf/timestamp.proto";
+import "ingredients.proto";
 
 package via.dk;
 
@@ -13,7 +14,7 @@ message Recipe {
   google.protobuf.Timestamp creation_date = 6;
   google.protobuf.Timestamp modification_date = 7;
   string image_link = 8;
-  repeated int32 ingredients_id = 9;
+  repeated Ingredient ingredients = 9;
 }
 
 
@@ -54,7 +55,6 @@ message RetrieveRecipeResponse {
   repeated Recipe recipes = 1;
 }
 
-//create is absolute bullshit, needs more work
 service RecipeService {
   rpc CreateRecipe(CreateRecipeRequest) returns (CreateRecipeResponse);
   rpc GetAllRecipes(RetrieveRecipeRequest) returns (RetrieveRecipeResponse);

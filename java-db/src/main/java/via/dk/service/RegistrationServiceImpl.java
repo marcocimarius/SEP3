@@ -5,8 +5,12 @@ import via.dk.*;
 import via.dk.dao.*;
 import via.dk.model.auth.CustomerInformation;
 import via.dk.model.auth.ICustomerInformation;
+import via.dk.dao.auth.ILoginDao;
+import via.dk.dao.auth.LoginDaoImpl;
+import via.dk.dao.auth.RegistrationDaoImpl;
 import via.dk.model.auth.Login;
 import via.dk.model.auth.Registration;
+import via.dk.dao.auth.IRegistrationDao;
 
 public class RegistrationServiceImpl extends RegistrationServiceGrpc.RegistrationServiceImplBase {
 	private final IRegistrationDao registrationDao;

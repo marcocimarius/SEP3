@@ -1,0 +1,50 @@
+﻿syntax = "proto3";
+option java_multiple_files = true;
+import "google/protobuf/timestamp.proto";
+import "recipes.proto";
+
+package via.dk;
+
+message CreateSelectionRequest {
+  int32 created_by_id = 1;
+  int32 admin_week_id = 2;
+  repeated int32 admin_week_recipes_id = 3;
+}
+
+message CreateSelectionResponse {
+  string status = 1;
+}
+
+message UpdateSelectionRequest {
+  int32 selection_id = 1;
+  repeated int32 recipe_ids = 2;
+}
+
+message UpdateSelectionResponse {
+  string status = 1;
+} 
+
+message DeleteSelectionRequest {
+  int32 selection_id = 1;
+}
+
+message DeleteSelectionResponse {
+  string status = 1;
+}
+
+message RetrieveSelectionRequest {
+  google.protobuf.Timestamp week_start_date = 1;
+  google.protobuf.Timestamp week_end_date = 2;
+  int32 created_by_id = 3;
+}
+
+message RetrieveSelectionResponse {
+  repeated Recipe recipes = 1;
+}
+
+service SelectionService {
+  rpc CreateSelection(CreateSelectionRequest) returns (CreateSelectionResponse);
+  rpc UpdateSelection(UpdateSelectionRequest) returns (UpdateSelectionResponse);
+  rpc DeleteSelection(DeleteSelectionRequest) returns (DeleteSelectionResponse);
+  rpc RetrieveSelection(RetrieveSelectionRequest) returns (RetrieveSelectionResponse);
+}
