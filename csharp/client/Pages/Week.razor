@@ -1,5 +1,8 @@
 @page "/week"
+@inject HttpClient httpClient
+@using System.Globalization
 @using BlazorApp1.Components
+@using Via.Dk
 
 <AuthorizeView Roles="User">
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Weeks</h1>
@@ -73,25 +76,30 @@
     List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
     List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
 
-    public void OnSubmit()
+    public async void OnSubmit()
     {
-        Console.WriteLine(CurrentWeek);
+        var yearWeek = CurrentWeek.Split("-W");
+        var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
+        var res = await httpClient.GetFromJsonAsync<AdminWeek>("api/adminweek?startDate=" + startDate.ToString("o") + "&endDate=" + endDate.ToString("o"));
+        Console.WriteLine(res);
     }
-    
+
     private void OnRecipeSelected(string id)
     {
-        if (SelectedRecipeIds.Contains(id))
-        {
-            // If the recipe is already selected, remove it
-            SelectedRecipeIds.Remove(id);
-        }
-        else
-        {
-            // Add recipe only if the limit is not reached
-            if (SelectedRecipeIds.Count < 3)
+            if (SelectedRecipeIds.Contains(id))
             {
-                SelectedRecipeIds.Add(id);
+                // If the recipe is already selected, remove it
+                SelectedRecipeIds.Remove(id);
             }
-        }
+            else
+            {
+                // Add recipe only if the limit is not reached
+                if (SelectedRecipeIds.Count < 3)
+                {
+                        SelectedRecipeIds.Add(id);
+            }
     }
+}
+
 }

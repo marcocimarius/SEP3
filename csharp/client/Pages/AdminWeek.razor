@@ -1,0 +1,88 @@
+@page "/admin-week"
+@inject HttpClient httpClient
+@using System.Globalization
+@using BlazorApp1.Components
+@using Via.Dk
+
+<AuthorizeView Roles="User">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Weeks</h1>
+    <div class="mb-4">
+        <h2 class="text-lg font-semibold text-gray-700">
+            Selected Recipes: @string.Join(", ", SelectedRecipeIds)
+        </h2>
+    </div>
+    <input type="week"
+           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
+           @bind="CurrentWeek"
+    />
+    <button onclick="@OnSubmit" class="btn">
+        Submit
+    </button>
+    <div class="grid grid-cols-3 gap-4">
+        @foreach (var recipe in recipes)
+        {
+        <RecipeCard
+            Id="recipe.Id"
+            ImageUrl="@recipe.ImageLink"
+            Title="@recipe.Name"
+            Type="@recipe.Type"
+            Ingredients="@recipe.Ingredients.Select(i => i.Name).ToList()"
+            Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+            Selectable="true"
+            OnSelected="OnRecipeSelected"
+            IsSelected="@SelectedRecipeIds.Contains(recipe.Id.ToString())"
+        />
+        }
+    </div>
+</AuthorizeView>
+
+
+@code {
+    public string CurrentWeek { get; set; }
+    private List<string> SelectedRecipeIds { get; set; } = new();
+    List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
+    List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
+    List<Via.Dk.Recipe> recipes = new List<Via.Dk.Recipe>();
+
+    private async Task<IEnumerable<Via.Dk.Recipe>> GetRecipes()
+    {
+        return await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Recipe>>("api/Recipe/allRecipes");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var newRecipes = await GetRecipes();
+            recipes.AddRange(newRecipes);
+            StateHasChanged();
+        }
+    }
+
+    public async void OnSubmit()
+    {
+        var yearWeek = CurrentWeek.Split("-W");
+        var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
+        var res = await httpClient.GetFromJsonAsync<AdminWeek>("api/adminweek?startDate=" + startDate.ToString("o") + "&endDate=" + endDate.ToString("o"));
+        Console.WriteLine(res);
+    }
+
+    private void OnRecipeSelected(string id)
+    {
+        if (SelectedRecipeIds.Contains(id))
+        {
+            // If the recipe is already selected, remove it
+            SelectedRecipeIds.Remove(id);
+        }
+        else
+        {
+            // Add recipe only if the limit is not reached
+            if (SelectedRecipeIds.Count < 3)
+            {
+                SelectedRecipeIds.Add(id);
+            }
+        }
+    }
+
+}
