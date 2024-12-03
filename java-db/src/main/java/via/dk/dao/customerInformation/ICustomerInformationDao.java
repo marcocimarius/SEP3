@@ -1,4 +1,4 @@
-package via.dk.dao;
+package via.dk.dao.customerInformation;
 
 import via.dk.model.auth.ICustomerInformation;
 
