@@ -1,4 +1,5 @@
 @using BlazorApp1.Pages
+@using Microsoft.AspNetCore.Components
 @using Recipe = Via.Dk.Recipe
 <div tabindex="@GetTabIndex()" aria-label="@GetLabel()"
      class="relative rounded overflow-hidden shadow-lg @SelectedClass @GetSelectableClasses()"
@@ -64,7 +65,7 @@
     [Parameter] public IReadOnlyList<string> Types { get; set; }
     [Parameter] public IReadOnlyList<string> Ingredients { get; set; }
 
-    public void onSelected()
+   public void onSelected(){}
     [Parameter] public IReadOnlyList<string> Allergens { get; set; }
     [Parameter] public EventCallback<string> OnSelected { get; set; }
     [Parameter] public bool Selectable { get; set; } = false;
