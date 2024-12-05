@@ -11,6 +11,7 @@ public class GrpcClient
     public IngredientsClient IngredientsClient { get; }
     public AdminWeekSelectionClient AdminWeekSelectionClient { get; }
     public SelectionClient SelectionClient { get; }
+    public SubscriptionClient SubscriptionClient { get; }
 
     public GrpcClient()
     {
@@ -21,5 +22,6 @@ public class GrpcClient
         this.AdminWeekSelectionClient = new AdminWeekSelectionClient(channel);
         this.SelectionClient = new SelectionClient(channel);
         this.RegistrationClient = new RegistrationClient(channel);
+        this.SubscriptionClient = new SubscriptionClient(channel);
     }
 }

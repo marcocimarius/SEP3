@@ -14,6 +14,7 @@ public class Main {
 				.addService((BindableService) new IngredientServiceImp())
 				.addService(new AdminWeekSelectionServiceImpl())
 				.addService(new SelectionServiceImpl())
+				.addService(new SubscriptionServiceImpl())
 				.build();
 
 		server.start();

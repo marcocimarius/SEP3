@@ -2,7 +2,8 @@ package via.dk.service;
 
 import io.grpc.stub.StreamObserver;
 import via.dk.*;
-import via.dk.dao.*;
+import via.dk.dao.customerInformation.CustomerInformationDaoImpl;
+import via.dk.dao.customerInformation.ICustomerInformationDao;
 import via.dk.model.auth.CustomerInformation;
 import via.dk.model.auth.ICustomerInformation;
 import via.dk.dao.auth.ILoginDao;
