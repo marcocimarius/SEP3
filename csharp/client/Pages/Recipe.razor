@@ -18,7 +18,7 @@
     </div>
     <div class="w-1/5">
         <label for="type" class="block mb-2 text-sm font-medium text-gray-900">Type</label>
-        <select id="type" @bind="SelectedType"
+        <select id="type-filter" @bind="SelectedType"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
             <option value="">Select type</option>
             @foreach (var type in Types)
@@ -29,7 +29,7 @@
     </div>
     <div class="w-1/5">
         <label for="allergen" class="block mb-2 text-sm font-medium text-gray-900">Allergen</label>
-        <select id="allergen" @bind="SelectedAllergen"
+        <select id="allergen-filter" @bind="SelectedAllergen"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
             <option value="">Select allergen</option>
             @foreach (var allergen in Allergens)
@@ -61,8 +61,8 @@
             </button>
         </div>
         <div>
-            <label for="ingredientName" class="block mb-2 text-sm font-medium text-gray-900">Name *</label>
-            <input type="text" id="ingredientName" name="ingredientName" @bind="IngredientName"
+            <label for="ingredient-name" class="block mb-2 text-sm font-medium text-gray-900">Name *</label>
+            <input type="text" id="ingredient-name" name="ingredientName" @bind="IngredientName"
                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 @(FieldErrors["ingredientName"] ? "border-red-500" : "")"
                    placeholder="Enter ingredient name" />
         </div>
@@ -124,9 +124,9 @@
 
             <!-- Ingredients -->
             <div class="p-6 border border-gray-300 rounded-lg">
-                <label for="recipeIngredients" class="block mb-2 text-sm font-medium text-gray-900">Ingredients</label>
+                <label for="recipe-ingredients" class="block mb-2 text-sm font-medium text-gray-900">Ingredients</label>
                 <div class="flex items-center space-x-2">
-                    <select id="recipeIngredients" @bind="SelectedIngredient" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 mr-2 @(FieldErrors["selectedIngredient"] ? "border-red-500" : "")">
+                    <select id="recipe-ingredients" @bind="SelectedIngredient" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 mr-2 @(FieldErrors["selectedIngredient"] ? "border-red-500" : "")">
                         <option value="">Select ingredient</option>
                         @foreach (var ingredient in Ingredients)
                         {
@@ -174,8 +174,8 @@
         <div class="w-1/2 flex flex-col space-y-4">
             <!-- Recipe Name -->
             <div class="p-6 border border-gray-300 rounded-lg">
-                <label for="recipeName" class="block mb-2 text-sm font-medium text-gray-900">Name *</label>
-                <input type="text" id="recipeName" @bind="NewRecipeName"
+                <label for="recipe-name" class="block mb-2 text-sm font-medium text-gray-900">Name *</label>
+                <input type="text" id="recipe-name" @bind="NewRecipeName"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 @(FieldErrors["recipeName"] ? "border-red-500" : "")"
                        placeholder="Enter recipe name"/>
             </div>
@@ -183,7 +183,7 @@
             <!-- Recipe Description -->
             <div class="p-6 border border-gray-300 rounded-lg">
                 <label for="recipeDescription" class="block mb-2 text-sm font-medium text-gray-900">Description *</label>
-                <textarea id="recipeDescription" @bind="NewRecipeDescription"
+                <textarea id="recipe-description" @bind="NewRecipeDescription"
                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 h-80 @(FieldErrors["recipeDescription"] ? "border-red-500" : "")"
                           placeholder="Enter recipe description"></textarea>
             </div>
@@ -349,7 +349,7 @@
     </div>
 </dialog>
 
-<div class="flex gap-4">
+<div class="flex flex-wrap gap-4">
     @foreach (var recipe in FilteredRecipes)
     {
         <div class="flex-1 max-w-[33%]">
@@ -371,13 +371,11 @@
 
 @code {
     // New Recipe properties and methods
-    private string NewRecipeName { get; set; } = string.Empty;
+    private string NewRecipeName { get; set; }
     private string NewRecipeDescription { get; set; } = string.Empty;
-    private List<string> NewSelectedType { get; set; } = new List<string>();
-    private List<string> NewSelectedAllergen { get; set; } = new List<string>();
     private string SelectedIngredient { get; set; } = string.Empty;
     private List<string> NewRecipeIngredients { get; set; } = new List<string>();
-    private bool IsRecipeDialog { get; set; } = false;
+    private bool IsRecipeDialog { get; set; }
 
     private void AddIngredientToList()
     {
@@ -408,8 +406,6 @@
         NewRecipeName = string.Empty;
         NewRecipeDescription = string.Empty;
         NewRecipeIngredients = new List<string>();
-        NewSelectedType = new List<string>();
-        NewSelectedAllergen = new List<string>();
         SelectedIngredient = string.Empty;
         SelectedType = string.Empty;
         SelectedAllergen = string.Empty;
@@ -629,37 +625,12 @@
 
     // Modify and Delete Recipe properties and methods
     private int SelectedRecipeId { get; set; }
-    private string SelectedRecipeAction { get; set; }
+    private string? SelectedRecipeAction { get; set; }
     private string ModifySelectedType { get; set; } = string.Empty;
     private string ModifySelectedAllergen { get; set; } = string.Empty;
 
     private RecipeModel? EditingRecipe { get; set; } = null;
-
-    private async Task SaveRecipe()
-    {
-    if (EditingRecipe is null) return;
-
-    if (EditingRecipe.Id == 0)
-    {
-        EditingRecipe.Id = Recipes.Max(r => r.Id) + 1;
-        Recipes.Add(EditingRecipe);
-    }
-    else
-    {
-    var existingRecipe = Recipes.FirstOrDefault(r => r.Id == EditingRecipe.Id);
-    if (existingRecipe is not null)
-        {
-            existingRecipe.Title = EditingRecipe.Title;
-            existingRecipe.Description = EditingRecipe.Description;
-            existingRecipe.Types = EditingRecipe.Types.ToList();
-            existingRecipe.Ingredients = EditingRecipe.Ingredients.ToList();
-            existingRecipe.Allergens = EditingRecipe.Allergens.ToList();
-        }
-    }
-
-        EditingRecipe = null;
-        await Js.InvokeVoidAsync("hideDialog", "newRecipeDialog");
-    }
+    
 
     private async Task OnRecipeSelected(string action)
     {
@@ -679,8 +650,6 @@
         NewRecipeName = recipe.Title;
         NewRecipeDescription = recipe.Description;
         NewRecipeIngredients = new List<string>(recipe.Ingredients);
-        NewSelectedType = new List<string>(recipe.Types);
-        NewSelectedAllergen = new List<string>(recipe.Allergens);
         ModifySelectedType = recipe.Types.FirstOrDefault() ?? string.Empty;
         ModifySelectedAllergen = recipe.Allergens.FirstOrDefault() ?? string.Empty;
     }
@@ -713,10 +682,8 @@
     // Delete Recipe methods
     private async Task ConfirmDeleteRecipe()
     {
-        var recipeCountBefore = Recipes.Count;
         Recipes.RemoveAll(r => r.Id == SelectedRecipeId);
 
-        var recipeCountAfter = Recipes.Count;
         await Js.InvokeVoidAsync("hideDialog", "deleteRecipeDialog");
     }
 
