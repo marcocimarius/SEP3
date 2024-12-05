@@ -2,9 +2,10 @@
 @inject HttpClient httpClient
 @using System.Globalization
 @using BlazorApp1.Components
+@using Google.Protobuf.WellKnownTypes
 @using Via.Dk
 
-<AuthorizeView Roles="User">
+<AuthorizeView Roles="Admin">
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Weeks</h1>
     <div class="mb-4">
         <h2 class="text-lg font-semibold text-gray-700">
@@ -64,8 +65,16 @@
         var yearWeek = CurrentWeek.Split("-W");
         var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
         var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
-        var res = await httpClient.GetFromJsonAsync<AdminWeek>("api/adminweek?startDate=" + startDate.ToString("o") + "&endDate=" + endDate.ToString("o"));
-        Console.WriteLine(res);
+        var adminWeekSelection = new CreateAdminWeekSelectionRequest
+        {
+            WeekStartDate = Timestamp.FromDateTime(startDate.ToUniversalTime()),
+            WeekEndDate = Timestamp.FromDateTime(endDate.ToUniversalTime())
+        };
+        adminWeekSelection.RecipeIds.AddRange(SelectedRecipeIds.Select(int.Parse));
+        // TODO fix
+        adminWeekSelection.CreatedById = 1;
+        
+        var res = await httpClient.PostAsJsonAsync("api/AdminWeek", adminWeekSelection);
     }
 
     private void OnRecipeSelected(string id)
@@ -74,15 +83,10 @@
         {
             // If the recipe is already selected, remove it
             SelectedRecipeIds.Remove(id);
+            return;
         }
-        else
-        {
-            // Add recipe only if the limit is not reached
-            if (SelectedRecipeIds.Count < 3)
-            {
-                SelectedRecipeIds.Add(id);
-            }
-        }
+
+        SelectedRecipeIds.Add(id);
     }
 
 }

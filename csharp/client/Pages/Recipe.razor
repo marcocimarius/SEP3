@@ -219,10 +219,10 @@
     </div>
 </dialog>
 
-<div class="flex gap-4">
+<div class="grid grid-cols-3 gap-4">
     @foreach (var recipe in FilteredRecipes)
     {
-        <div class="flex-1 max-w-[33%]">
+        <div class="">
             <RecipeCard
                 ImageUrl="@recipe.ImageLink"
                 Title="@recipe.Name"
@@ -300,7 +300,13 @@
         StateHasChanged(); // Refresh the UI with the updated `FilteredRecipes`.
     }
 
+    // filter based on filter fields
     private List<Via.Dk.Recipe> FilteredRecipes => Recipes
+        .Where(r => string.IsNullOrWhiteSpace(SearchText) || r.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+        .Where(r => string.IsNullOrWhiteSpace(SelectedType) || r.Type == SelectedType)
+        .Where(r => string.IsNullOrWhiteSpace(SelectedAllergen))
+        .ToList();
+        
 
     private async Task<IEnumerable<Via.Dk.Recipe>> GetRecipes()
     {
