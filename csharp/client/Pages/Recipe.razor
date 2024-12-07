@@ -2,6 +2,7 @@
 @inject HttpClient httpClient;
 @using System.Text.Json
 @using BlazorApp1.Components
+@using DefaultNamespace
 @using Via.Dk
 @inject IJSRuntime Js
 @attribute [Authorize]
@@ -77,9 +78,9 @@
             <select id="ingredientType" name="ingredientType" @bind="IngredientType"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 @(FieldErrors["ingredientType"] ? "border-red-500" : "")">
                 <option value="">Select type</option>
-                @foreach (var type in Types)
+                @for (int i = 0; i < Types.Count; i++)
                 {
-                    <option value="@type">@type</option>
+                    <option value="@(i + 1)">@Types[i]</option>
                 }
             </select>
         </div>
@@ -298,8 +299,8 @@
         {
             try
             {
-            await CreateRecipe();
-            HideNewRecipeDialog();
+                await CreateRecipe();
+                await HideNewRecipeDialog();
             }
             catch (Exception e)
             {
@@ -341,6 +342,17 @@
         });
     }
 
+    private async Task CreateIngredient()
+    {
+        await httpClient.PostAsJsonAsync("api/Ingredients", new CreateIngredientRequest()
+        {
+            Name = IngredientName,
+            TypeId = IngredientType,
+            ContainsAllergens = IsAllergen,
+            Calories = IngredientCalories
+        });
+    }
+
     private async Task<IEnumerable<Ingredient>?> GetIngredients()
     {
         return await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Ingredient>>("api/Ingredients");
@@ -369,14 +381,14 @@
 
     // Ingredient properties and methods
     private string IngredientName { get; set; } = string.Empty;
-    private string IngredientType { get; set; } = string.Empty;
+    private int IngredientType { get; set; }
     private int IngredientCalories { get; set; }
     private bool IsAllergen { get; set; }
 
     private void ValidateIngredientFields()
     {
         FieldErrors["ingredientName"] = string.IsNullOrWhiteSpace(IngredientName);
-        FieldErrors["ingredientType"] = string.IsNullOrWhiteSpace(IngredientType);
+        FieldErrors["ingredientType"] = IngredientType == 0;
         FieldErrors["ingredientCalories"] = IngredientCalories <= 0;
 
         IsError = FieldErrors["ingredientName"] || FieldErrors["ingredientType"] || FieldErrors["ingredientCalories"];
@@ -404,9 +416,16 @@
         ValidateIngredientFields();
         if (!IsError)
         {
-            await HideNewIngredientDialog();
-            await Js.InvokeVoidAsync("console.log", $"Ingredient Name: {IngredientName}, Type: {IngredientType}, Calories: {IngredientCalories}, Is Allergen: {IsAllergen}");
-            SuccessMessage();
+            try
+            {
+                await CreateIngredient();
+                await HideNewIngredientDialog();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
         else
         {
@@ -470,7 +489,7 @@
     private string SelectedType { get; set; } = string.Empty;
     private string SelectedAllergen { get; set; } = string.Empty;
 
-    List<string> Types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
+    List<string> Types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Unrestricted" };
     List<string> Allergens = new List<string> { "Gluten", "Peanuts", "Eggs", "Soy" };
 }
 
