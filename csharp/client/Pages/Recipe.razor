@@ -300,6 +300,7 @@
             try
             {
                 await CreateRecipe();
+                await GetRecipes();
                 await HideNewRecipeDialog();
             }
             catch (Exception e)
@@ -327,9 +328,11 @@
         .ToList();
 
 
-    private async Task<IEnumerable<Via.Dk.Recipe>?> GetRecipes()
+    private async Task GetRecipes()
     {
-        return await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Recipe>>("api/Recipe/allRecipes");
+        var newRecipes = await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Recipe>>("api/Recipe/allRecipes");
+        if (newRecipes != null) Recipes = [..newRecipes];
+        StateHasChanged();
     }
 
     private async Task CreateRecipe()
@@ -353,11 +356,12 @@
         });
     }
 
-    private async Task<IEnumerable<Ingredient>?> GetIngredients()
+    private async Task GetIngredients()
     {
-        return await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Ingredient>>("api/Ingredients");
+        var newIngredients = await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Ingredient>>("api/Ingredients");
+        if (newIngredients != null) Ingredients = [..newIngredients];
+        StateHasChanged();
     }
-
 
     private List<Via.Dk.Recipe> Recipes = new List<Via.Dk.Recipe>
     {
@@ -371,11 +375,8 @@
     {
         if (firstRender)
         {
-            var newRecipes = await GetRecipes();
-            if (newRecipes != null) Recipes.AddRange(newRecipes);
-            var newIngredients = await GetIngredients();
-            if (newIngredients != null) Ingredients.AddRange(newIngredients);
-            StateHasChanged();
+            await GetRecipes();
+            await GetIngredients();
         }
     }
 
@@ -419,6 +420,7 @@
             try
             {
                 await CreateIngredient();
+                await GetIngredients();
                 await HideNewIngredientDialog();
             }
             catch (Exception e)
