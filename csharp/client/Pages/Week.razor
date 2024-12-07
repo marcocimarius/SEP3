@@ -1,54 +1,96 @@
 @page "/week"
+@inject HttpClient httpClient
+@using System.Globalization
+@using System.Text.Json
 @using BlazorApp1.Components
+@using DefaultNamespace
+@using Via.Dk
 
 <AuthorizeView Roles="User">
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Weeks</h1>
-    <input type="week"
-           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-           @bind="CurrentWeek"
-    />
-    <button onclick="@OnSubmit" class="btn">
-        Submit
-    </button>
-    <div class="flex gap-4">
-        <RecipeCard
-            ImageUrl="assets/spaghetti-bolog.jpg"
-            Title="Spaghetti bolognese"
-            Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-            Types="types"
-            Ingredients="ingredients"
-            Selectable="true"
-            Id="1"
-            OnSelected="(s) => Console.WriteLine(s)"
+    <div class="mb-4">
+        <h2 class="text-lg font-semibold text-gray-700">
+            Selected Recipes: @string.Join(", ", SelectedRecipeIds)
+        </h2>
+        <p class="text-sm text-gray-600">
+            (You can select up to 3 recipes)
+        </p>
+    </div>
+    <div class="flex gap-3">
+        <input type="week"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
+               @bind="CurrentWeek"
         />
-        <RecipeCard
-            ImageUrl="assets/spaghetti-bolog.jpg"
-            Title="Spaghetti bolognese"
-            Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-            Types="types"
-            Ingredients="ingredients"
-            Selectable="true"
-            Id="2"
-        />
-        <RecipeCard
-            ImageUrl="assets/spaghetti-bolog.jpg"
-            Title="Spaghetti bolognese"
-            Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-            Types="types"
-            Ingredients="ingredients"
-            Id="3"
-        />
+        <button onclick="@OnSubmit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
+        >
+            Find week
+        </button>
+    </div>
+    <div class="grid grid-cols-3 gap-4">
+        @foreach (var recipe in recipes)
+        {
+            <RecipeCard
+                @key="recipe.Id"
+                ImageUrl="@recipe.ImageLink"
+                Title="@recipe.Name"
+                Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
+                Type="@recipe.Type"
+                Ingredients="recipe.Ingredients.Select(i => i.Name).ToList()"
+                Id="@recipe.Id"
+                Selectable="true"
+                OnSelected="OnRecipeSelected"
+                IsSelected="@SelectedRecipeIds.Contains(recipe.Id.ToString())"/>
+        }
     </div>
 </AuthorizeView>
 
 
 @code {
     public string CurrentWeek { get; set; }
+    private List<string> SelectedRecipeIds { get; set; } = new();
     List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
     List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
+    List<Via.Dk.Recipe> recipes = new List<Via.Dk.Recipe>();
 
-    public void OnSubmit()
+    public async void OnSubmit()
     {
-        Console.WriteLine(CurrentWeek);
+        var yearWeek = CurrentWeek.Split("-W");
+        var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
+        try
+        {
+            var content = await httpClient.GetStringAsync("api/AdminWeek?weekStartDate=" + startDate.ToString("o") + "&weekEndDate=" + endDate.ToString("o"));
+            var res = JsonSerializer.Deserialize<List<NormalizedWeek>>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            this.recipes = new List<Via.Dk.Recipe>(res[0].Recipes.ToArray());
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            this.recipes = new List<Via.Dk.Recipe>();
+            StateHasChanged();
+            Console.WriteLine(e);
+        }
     }
+
+    private void OnRecipeSelected(string id)
+    {
+        if (SelectedRecipeIds.Contains(id))
+        {
+            // If the recipe is already selected, remove it
+            SelectedRecipeIds.Remove(id);
+        }
+        else
+        {
+            // Add recipe only if the limit is not reached
+            if (SelectedRecipeIds.Count < 3)
+            {
+                SelectedRecipeIds.Add(id);
+            }
+        }
+    }
+
 }

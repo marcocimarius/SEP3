@@ -72,7 +72,7 @@ create table recipe (
     calories int default 0,
     creation_date date DEFAULT CURRENT_DATE,
     modification_date date null,
-    image_link varchar(100)
+    image_link varchar(1000)
 );
 
 create table ingredient (
@@ -296,11 +296,11 @@ INSERT INTO selection (created_by_id, admin_week_id) VALUES
 (2, 1);
 
 -- Insert mock data for `recipe`
-INSERT INTO recipe (name) VALUES
-('Spaghetti Bolognese'),
-('Vegetable Stir Fry'),
-('Salmon Salad'),
-('Chicken Curry');  -- Added Chicken Curry recipe
+INSERT INTO recipe (name, image_link) VALUES
+('Spaghetti Bolognese', 'https://www.valdemarsro.dk/wp-content/2015/09/bolognese-1.jpg'),
+('Vegetable Stir Fry', 'https://images.themodernproper.com/billowy-turkey/production/posts/VegetableStirFry_9.jpg?w=1200&h=1200&q=60&fm=jpg&fit=crop&dm=1703377301&s=3484d660c4b404c6d23b0c3ec7ac66eb'),
+('Salmon Salad', 'https://onebalancedlife.com/wp-content/uploads/2023/01/Salmon-Salad-scaled-720x720.jpg'),
+('Chicken Curry', 'https://www.allrecipes.com/thmb/QcrNwbI0JvxdPwZ47m2bj2HY7ck=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/46822-Indian-Chicken-Curry-103301-2x1-1-41bd5b8de7ed476ea3c1fc023168cf39.jpg');  -- Added Chicken Curry recipe
 
 -- Insert mock data for `ingredient`
 INSERT INTO ingredient (name, calories, is_allergen) VALUES
