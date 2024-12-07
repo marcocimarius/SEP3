@@ -1,5 +1,6 @@
 @page "/recipes"
 @inject HttpClient httpClient;
+@using System.Text.Json
 @using BlazorApp1.Components
 @using Via.Dk
 @inject IJSRuntime Js
@@ -122,9 +123,17 @@
         <div class="w-1/2 flex flex-col space-y-4 pr-10">
             <!-- Upload Image -->
             <div class="p-6 border border-gray-300 rounded-lg">
-                <label for="recipeImage" class="block mb-2 text-sm font-medium text-gray-900">Upload Image</label>
-                <input type="file" id="recipeImage" @onchange="HandleImageUpload"
+                <label for="recipeImage" class="block mb-2 text-sm font-medium text-gray-900">Image</label>
+                <input type="text" id="recipeImage" @bind="ImageLink"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"/>
+                @if (String.IsNullOrEmpty(ImageLink))
+                {
+                    <p>You need to insert a valid image link. And click away from this input</p>
+                }
+                @if (!String.IsNullOrEmpty(ImageLink))
+                {
+                    <img src="@ImageLink" alt="New image"/>
+                }
             </div>
 
             <!-- Ingredients -->
@@ -136,7 +145,7 @@
                         <option value="">Select ingredient</option>
                         @foreach (var ingredient in Ingredients)
                         {
-                            <option value="@ingredient">@ingredient</option>
+                            <option value="@ingredient.Id">@ingredient.Name</option>
                         }
                     </select>
                     <button type="button" @onclick="AddIngredientToList"
@@ -282,12 +291,21 @@
         await Js.InvokeVoidAsync("showDialog", "errorDialog");
     }
 
-    private void AddRecipe()
+    private async void AddRecipe()
     {
         ValidateRecipeFields();
         if (!IsError)
         {
+            try
+            {
+            await CreateRecipe();
             HideNewRecipeDialog();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
         else
         {
@@ -306,26 +324,48 @@
         .Where(r => string.IsNullOrWhiteSpace(SelectedType) || r.Type == SelectedType)
         .Where(r => string.IsNullOrWhiteSpace(SelectedAllergen))
         .ToList();
-        
 
-    private async Task<IEnumerable<Via.Dk.Recipe>> GetRecipes()
+
+    private async Task<IEnumerable<Via.Dk.Recipe>?> GetRecipes()
     {
         return await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Recipe>>("api/Recipe/allRecipes");
     }
+
+    private async Task CreateRecipe()
+    {
+        await httpClient.PostAsJsonAsync("api/Recipe", new CreateRecipeRequest()
+        {
+            Name = NewRecipeName,
+            ImageLink = ImageLink,
+            IngredientsId = { NewRecipeIngredients.Select(int.Parse).ToList() }
+        });
+    }
+
+    private async Task<IEnumerable<Ingredient>?> GetIngredients()
+    {
+        return await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Ingredient>>("api/Ingredients");
+    }
+
+
+    private List<Via.Dk.Recipe> Recipes = new List<Via.Dk.Recipe>
+    {
+    };
+
+    private List<Via.Dk.Ingredient> Ingredients = new List<Via.Dk.Ingredient>
+    {
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             var newRecipes = await GetRecipes();
-            Recipes.AddRange(newRecipes);
+            if (newRecipes != null) Recipes.AddRange(newRecipes);
+            var newIngredients = await GetIngredients();
+            if (newIngredients != null) Ingredients.AddRange(newIngredients);
             StateHasChanged();
         }
     }
-
-    private List<Via.Dk.Recipe> Recipes = new List<Via.Dk.Recipe>
-    {
-    };
 
     // Ingredient properties and methods
     private string IngredientName { get; set; } = string.Empty;
@@ -374,47 +414,8 @@
         }
     }
 
-    // Image upload methods
-    private string UploadedImageBase64 { get; set; } = string.Empty;
+    public string ImageLink { get; set; } = string.Empty;
 
-    private async void HandleImageUpload(ChangeEventArgs e)
-    {
-        if (e.Value is not null)
-        {
-            // Get the selected file
-            var fileInput = (Microsoft.AspNetCore.Components.Forms.IBrowserFile)e.Value;
-
-            // Validate the file type (e.g., allow only images)
-            if (!fileInput.ContentType.StartsWith("image/"))
-            {
-                ErrorMessage = "Only image files are allowed.";
-                IsError = true;
-                return;
-            }
-
-            // Define the maximum file size (e.g., 5 MB)
-            const long maxFileSize = 5 * 1024 * 1024;
-
-            if (fileInput.Size > maxFileSize)
-            {
-                ErrorMessage = "File size exceeds the maximum allowed limit of 5 MB.";
-                IsError = true;
-                return;
-            }
-
-            // Read the file as a Base64 string
-            using var stream = fileInput.OpenReadStream(maxFileSize);
-            using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
-
-            var imageBytes = memoryStream.ToArray();
-            UploadedImageBase64 = Convert.ToBase64String(imageBytes);
-
-            // Success message
-            IsError = false;
-            StateHasChanged();
-        }
-    }
 
     // Error dialog methods
     private bool IsError { get; set; } = false;
@@ -470,7 +471,6 @@
     private string SelectedAllergen { get; set; } = string.Empty;
 
     List<string> Types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
-    List<string> Ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
     List<string> Allergens = new List<string> { "Gluten", "Peanuts", "Eggs", "Soy" };
 }
 

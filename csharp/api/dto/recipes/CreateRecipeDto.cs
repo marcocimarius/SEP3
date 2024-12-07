@@ -4,5 +4,5 @@ public class CreateRecipeDto
 {
     public string Name { get; set; }
     public string ImageLink { get; set; }
-    public List<int> IngredientsIds { get; set; }
+    public List<int> IngredientsId { get; set; }
 }

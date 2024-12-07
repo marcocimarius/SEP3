@@ -37,7 +37,7 @@ public class RecipeController : ControllerBase
         {
             Name = recipe.Name,
             ImageLink = recipe.ImageLink,
-            IngredientsId = { recipe.IngredientsIds }
+            IngredientsId = { recipe.IngredientsId }
         };
         Console.WriteLine(request);
         try

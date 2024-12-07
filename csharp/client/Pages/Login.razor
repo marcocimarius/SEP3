@@ -6,10 +6,10 @@
 <div class="max-w-screen-xl mx-auto">
     <h1 class="font-bold text-3xl pt-4 pb-3">Login</h1>
     <div class="flex-col max-w-screen-xl justify-start items-start">
-        <div class="flex flex-col">
+        <form @onsubmit="LoginAsync" class="flex flex-col">
             <div>
-                <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Username *</label>
-                <input type="email" @bind="email" id="email"
+ aaa               <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Username *</label>
+                <input type="text" @bind="email" id="email"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
                 />
             </div>
@@ -19,19 +19,19 @@
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
                 />
             </div>
-        </div>
-        <NavLink href="register"><span class="link">You don't have an account?</span></NavLink>
-        <div class="py-2 flex justify-end items-center">
-            <p style="color: gray; margin-right: auto; font-size: small">* required fields</p>
-            @if (!String.IsNullOrEmpty(error))
-            {
-                <p style="color: red; margin-right: 15px">Failed to login @error</p>
-            }
-            <button @onclick="LoginAsync"
+            <div class="py-2 flex justify-end items-center">
+                <p style="color: gray; margin-right: auto; font-size: small">* required fields</p>
+                @if (!String.IsNullOrEmpty(error))
+                {
+                    <p style="color: red; margin-right: 15px">Failed to login @error</p>
+                }
+                <button
                     class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
-                Login
-            </button>
-        </div>
+                    Login
+                </button>
+            </div>
+        </form>
+        <NavLink href="register"><span class="link">You don't have an account?</span></NavLink>
     </div>
 </div>
 
@@ -53,4 +53,5 @@
             error = ex.Message;
         }
     }
+
 }
