@@ -16,13 +16,17 @@
             (You can select up to 3 recipes)
         </p>
     </div>
-    <input type="week"
-           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-           @bind="CurrentWeek"
-    />
-    <button onclick="@OnSubmit" class="btn">
-        Submit
-    </button>
+    <div class="flex gap-3">
+        <input type="week"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
+               @bind="CurrentWeek"
+        />
+        <button onclick="@OnSubmit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
+        >
+            Find week
+        </button>
+    </div>
     <div class="grid grid-cols-3 gap-4">
         @foreach (var recipe in recipes)
         {
@@ -54,15 +58,22 @@
         var yearWeek = CurrentWeek.Split("-W");
         var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
         var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
-        var content = await httpClient.GetStringAsync("api/AdminWeek?weekStartDate=" + startDate.ToString("o") + "&weekEndDate=" + endDate.ToString("o"));
-        Console.WriteLine(content);
-        var res = JsonSerializer.Deserialize<List<NormalizedWeek>>(content, new JsonSerializerOptions
+        try
         {
-            PropertyNameCaseInsensitive = true
-        });
-        Console.WriteLine(JsonSerializer.Serialize(res));
-        this.recipes = new List<Via.Dk.Recipe>(res[0].Recipes.ToArray());
-        StateHasChanged();
+            var content = await httpClient.GetStringAsync("api/AdminWeek?weekStartDate=" + startDate.ToString("o") + "&weekEndDate=" + endDate.ToString("o"));
+            var res = JsonSerializer.Deserialize<List<NormalizedWeek>>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            this.recipes = new List<Via.Dk.Recipe>(res[0].Recipes.ToArray());
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            this.recipes = new List<Via.Dk.Recipe>();
+            StateHasChanged();
+            Console.WriteLine(e);
+        }
     }
 
     private void OnRecipeSelected(string id)
