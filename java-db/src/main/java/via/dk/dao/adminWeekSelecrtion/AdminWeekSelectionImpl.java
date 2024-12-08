@@ -230,6 +230,7 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
         }
 
         AdminWeek.Builder adminWeek = AdminWeek.newBuilder()
+            .setId(adminWeekId)
             .setWeekStartDate(TimeConverter.toProtobufTimestamp(weekStartDate))
             .setWeekEndDate(TimeConverter.toProtobufTimestamp(weekEndDate))
             .addAllRecipes(recipes);
