@@ -16,6 +16,12 @@
             (You can select up to 3 recipes)
         </p>
     </div>
+    <h3>
+        @if (HasWeekPassed)
+        {
+            <span class="text-red-500">The selected week has passed</span>
+        }
+    </h3>
     <div class="flex gap-3">
         <input type="week"
                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
@@ -30,9 +36,9 @@
     <div class="grid grid-cols-3 gap-4">
         @if (recipes != null && recipes.Count == 0)
         {
-        <div class="p-4 bg-red-100 text-red-700 rounded-md mb-6 mt-6">
-            <p class="font-medium">No recipes found for this week. 😔</p>
-        </div>
+            <div class="p-4 bg-red-100 text-red-700 rounded-md mb-6 mt-6">
+                <p class="font-medium">No recipes found for this week. 😔</p>
+            </div>
         }
         @if (recipes != null)
         {
@@ -48,7 +54,9 @@
                     Id="@recipe.Id"
                     Selectable="true"
                     OnSelected="OnRecipeSelected"
-                    IsSelected="@SelectedRecipeIds.Contains(recipe.Id.ToString())"/>
+                    IsSelected="@SelectedRecipeIds.Contains(recipe.Id.ToString())"
+                    Disabled="@HasWeekPassed"
+                    />
             }
         }
     </div>
@@ -56,7 +64,21 @@
 
 
 @code {
-    public string CurrentWeek { get; set; }
+    public string? CurrentWeek { get; set; }
+    private bool _hasWeekPassed;
+
+    public bool HasWeekPassed
+    {
+        get
+        {
+            if (CurrentWeek == null) return false;
+            var yearWeek = CurrentWeek.Split("-W");
+            var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+            return startDate < DateTime.Now;
+        }
+        set { this._hasWeekPassed = value; }
+    }
+
     private List<string> SelectedRecipeIds { get; set; } = new();
     List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
     List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };

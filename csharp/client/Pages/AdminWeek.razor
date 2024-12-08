@@ -1,7 +1,11 @@
 @page "/admin-week"
 @inject HttpClient httpClient
+@inject AuthenticationStateProvider authProvider
 @using System.Globalization
+@using System.Text.Json
 @using BlazorApp1.Components
+@using BlazorApp1.Providers
+@using DefaultNamespace
 @using Google.Protobuf.WellKnownTypes
 @using Via.Dk
 
@@ -21,12 +25,12 @@
     <div class="flex gap-3">
         <input type="week"
                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block p-2.5"
-               @bind="CurrentWeek"
+               value="@CurrentWeek"
+               onchange="@GetAdminWeek"
         />
         <button onclick="@OnSubmit"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
-        >
-            Find week
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
+            Lock week
         </button>
     </div>
     <div class="grid grid-cols-3 gap-4">
@@ -54,6 +58,7 @@
     public string? CurrentWeek { get; set; }
 
     private bool _hasWeekPassed;
+
     public bool HasWeekPassed
     {
         get
@@ -63,16 +68,12 @@
             var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
             return startDate < DateTime.Now;
         }
-        set
-        {
-            this._hasWeekPassed = value;        
-        }
+        set { this._hasWeekPassed = value; }
     }
 
     private List<string> SelectedRecipeIds { get; set; } = new();
-    List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
-    List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
     List<Via.Dk.Recipe> recipes = new List<Via.Dk.Recipe>();
+    NormalizedWeek? CurrentAdminWeek = null;
 
     private async Task<IEnumerable<Via.Dk.Recipe>?> GetRecipes()
     {
@@ -89,11 +90,53 @@
         }
     }
 
-    public async void OnSubmit()
+    private async Task GetAdminWeek(ChangeEventArgs e)
+    {
+        Console.WriteLine("Change");
+        CurrentWeek = e.Value?.ToString();
+        var yearWeek = CurrentWeek.Split("-W");
+        var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
+        var adminWeekSelection = new RetrieveAdminWeekSelectionRequest()
+        {
+            WeekStartDate = Timestamp.FromDateTime(startDate.ToUniversalTime()),
+            WeekEndDate = Timestamp.FromDateTime(endDate.ToUniversalTime())
+        };
+        try
+        {
+            var res = await httpClient.GetFromJsonAsync<List<NormalizedWeek>>("api/AdminWeek?weekStartDate=" + startDate.ToUniversalTime().ToString("o") + "&weekEndDate=" + endDate.ToUniversalTime().ToString("o"), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            if (res != null)
+                CurrentAdminWeek = new NormalizedWeek
+                {
+                    Recipes = res[0].Recipes,
+                    WeekStartDate = res[0].WeekStartDate,
+                    WeekEndDate = res[0].WeekEndDate
+                };
+            SelectedRecipeIds = CurrentAdminWeek?.Recipes.Select(r => r.Id.ToString()).ToList() ?? new List<string>();
+            foreach (var id in SelectedRecipeIds)
+            {
+                Console.WriteLine(id);
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("here");
+            SelectedRecipeIds = new List<string>();
+            Console.WriteLine(ex);
+        }
+    }
+
+
+    public async Task OnSubmit()
     {
         var yearWeek = CurrentWeek.Split("-W");
-        var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday).AddDays(1);
-        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday).AddDays(1);
+        var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
         var adminWeekSelection = new CreateAdminWeekSelectionRequest
         {
             WeekStartDate = Timestamp.FromDateTime(startDate.ToUniversalTime()),
@@ -101,9 +144,15 @@
         };
         adminWeekSelection.RecipeIds.AddRange(SelectedRecipeIds.Select(int.Parse));
         // TODO fix
-        adminWeekSelection.CreatedById = 1;
-
-        var res = await httpClient.PostAsJsonAsync("api/AdminWeek", adminWeekSelection);
+        adminWeekSelection.CreatedById = authProvider.GetAuthenticationStateAsync().Id;
+        Console.WriteLine(CurrentAdminWeek);
+        if (CurrentAdminWeek == null)
+        {
+            var res = await httpClient.PostAsJsonAsync("api/AdminWeek", adminWeekSelection);
+            //TODO: Add success message
+            return;
+        }
+        var res2 = await httpClient.PutAsJsonAsync("api/AdminWeek", adminWeekSelection);
     }
 
     private void OnRecipeSelected(string id)
