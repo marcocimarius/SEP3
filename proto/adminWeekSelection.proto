@@ -42,9 +42,10 @@ message RetrieveAdminWeekSelectionRequest {
 }
 
 message AdminWeek {
-  repeated Recipe recipes = 1;
-  google.protobuf.Timestamp week_start_date = 2;
-  google.protobuf.Timestamp week_end_date = 3;
+  int32 id = 1;
+  repeated Recipe recipes = 2;
+  google.protobuf.Timestamp week_start_date = 3;
+  google.protobuf.Timestamp week_end_date = 4;
 }
 
 message RetrieveAdminWeekSelectionResponse {
