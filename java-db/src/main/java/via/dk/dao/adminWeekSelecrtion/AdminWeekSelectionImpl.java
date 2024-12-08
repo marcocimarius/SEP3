@@ -90,14 +90,16 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
         update admin_week \s
         set created_by_id = ?,
             week_start_date = ?,
-            week_end_date = ?
+            week_end_date = ?,
+            modification_date = ?
         where id = ?
         """);
 
       statement.setInt(1, request.getCreatedById());
       statement.setTimestamp(2, TimeConverter.toJavaTimestamp(request.getWeekStartDate()));
       statement.setTimestamp(3, TimeConverter.toJavaTimestamp(request.getWeekEndDate()));
-      statement.setInt(4, request.getAdminWeekId());
+      statement.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+      statement.setInt(5, request.getAdminWeekId());
 
       if (statement.executeUpdate() != 0) {
         statement = db.prepareStatement("""
@@ -230,6 +232,7 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
         }
 
         AdminWeek.Builder adminWeek = AdminWeek.newBuilder()
+            .setId(adminWeekId)
             .setWeekStartDate(TimeConverter.toProtobufTimestamp(weekStartDate))
             .setWeekEndDate(TimeConverter.toProtobufTimestamp(weekEndDate))
             .addAllRecipes(recipes);
