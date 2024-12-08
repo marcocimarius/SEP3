@@ -73,7 +73,7 @@
 
     private List<string> SelectedRecipeIds { get; set; } = new();
     List<Via.Dk.Recipe> recipes = new List<Via.Dk.Recipe>();
-    NormalizedWeek? CurrentAdminWeek = null;
+    NormalizedAdminWeek? CurrentAdminWeek = null;
 
     private async Task<IEnumerable<Via.Dk.Recipe>?> GetRecipes()
     {
@@ -104,23 +104,19 @@
         };
         try
         {
-            var res = await httpClient.GetFromJsonAsync<List<NormalizedWeek>>("api/AdminWeek?weekStartDate=" + startDate.ToUniversalTime().ToString("o") + "&weekEndDate=" + endDate.ToUniversalTime().ToString("o"), new JsonSerializerOptions
+            var res = await httpClient.GetFromJsonAsync<List<NormalizedAdminWeek>>("api/AdminWeek?weekStartDate=" + startDate.ToUniversalTime().ToString("o") + "&weekEndDate=" + endDate.ToUniversalTime().ToString("o"), new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
             if (res != null)
-                CurrentAdminWeek = new NormalizedWeek
+                CurrentAdminWeek = new NormalizedAdminWeek
                 {
+                    Id = res[0].Id,
                     Recipes = res[0].Recipes,
                     WeekStartDate = res[0].WeekStartDate,
                     WeekEndDate = res[0].WeekEndDate
                 };
             SelectedRecipeIds = CurrentAdminWeek?.Recipes.Select(r => r.Id.ToString()).ToList() ?? new List<string>();
-            foreach (var id in SelectedRecipeIds)
-            {
-                Console.WriteLine(id);
-            }
-
             StateHasChanged();
         }
         catch (Exception ex)
@@ -144,7 +140,6 @@
             WeekEndDate = Timestamp.FromDateTime(endDate.ToUniversalTime())
         };
         adminWeekSelection.RecipeIds.AddRange(SelectedRecipeIds.Select(int.Parse));
-        // TODO fix
         adminWeekSelection.CreatedById = authProvider.GetAuthenticationStateAsync().Id;
         Console.WriteLine(CurrentAdminWeek);
         if (CurrentAdminWeek == null)
@@ -153,7 +148,16 @@
             //TODO: Add success message
             return;
         }
-        var res2 = await httpClient.PutAsJsonAsync("api/AdminWeek", adminWeekSelection);
+
+        var adminWeekSelectionChange = new UpdateAdminWeekSelectionRequest
+        {
+            AdminWeekId = CurrentAdminWeek.Id,
+            WeekStartDate = Timestamp.FromDateTime(startDate.ToUniversalTime()),
+            WeekEndDate = Timestamp.FromDateTime(endDate.ToUniversalTime())
+        };
+        adminWeekSelectionChange.RecipeIds.AddRange(SelectedRecipeIds.Select(int.Parse));
+        adminWeekSelectionChange.CreatedById = authProvider.GetAuthenticationStateAsync().Id;
+        var res2 = await httpClient.PutAsJsonAsync("api/AdminWeek", adminWeekSelectionChange);
     }
 
     private void OnRecipeSelected(string id)

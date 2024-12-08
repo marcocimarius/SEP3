@@ -228,44 +228,41 @@
 </dialog>
 
 <!-- Modify Recipe Dialog -->
-<dialog id="modifyRecipeDialog" class="rounded-lg p-6 bg-white shadow-lg w-2/3">
+<dialog id="modifyRecipeDialog" class="rounded-lg p-4 bg-white shadow-lg w-2/3 overflow-auto">
     <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold pb-3">Modify Recipe</h3>
-        <button type="button" @onclick="CancelModifyRecipe" class="text-gray-500 hover:text-gray-700">
+        <h3 class="text-xl font-bold">Modify Recipe</h3>
+        <button type="button" @onclick="CancelRecipe" class="text-gray-500 hover:text-gray-700">
             &times;
         </button>
     </div>
     <form method="dialog" class="flex space-x-6">
         <!-- Left Column -->
         <div class="w-1/2 flex flex-col space-y-4 pr-10">
-            <!-- Recipe Name -->
+            <!-- Upload Image -->
             <div class="p-6 border border-gray-300 rounded-lg">
-                <label for="recipeName" class="block mb-2 text-sm font-medium text-gray-900">Name *</label>
-                <input type="text" id="recipeName" @bind="NewRecipeName"
+                <label for="recipeImage" class="block mb-2 text-sm font-medium text-gray-900">Image</label>
+                <input type="text" id="modifyRecipeImage" @bind="EditingRecipe.ImageLink"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"/>
+                @if (String.IsNullOrEmpty(EditingRecipe.ImageLink))
+                {
+                    <p>You need to insert a valid image link. And click away from this input</p>
+                }
+                @if (!String.IsNullOrEmpty(EditingRecipe.ImageLink))
+                {
+                    <img src="@ImageLink" alt="New image"/>
+                }
             </div>
 
-            <!-- Recipe Description -->
-            <div class="p-6 border border-gray-300 rounded-lg">
-                <label for="recipeDescription" class="block mb-2 text-sm font-medium text-gray-900">Description
-                    *</label>
-                <textarea id="recipeDescription" @bind="NewRecipeDescription"
-                          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 h-56"></textarea>
-            </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="w-1/2 flex flex-col space-y-4">
             <!-- Ingredients -->
             <div class="p-6 border border-gray-300 rounded-lg">
                 <label for="recipeIngredients" class="block mb-2 text-sm font-medium text-gray-900">Ingredients</label>
                 <div class="flex items-center space-x-2">
                     <select id="recipeIngredients" @bind="SelectedIngredient"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 mr-2">
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 mr-2 @(FieldErrors["selectedIngredient"] ? "border-red-500" : "")">
                         <option value="">Select ingredient</option>
                         @foreach (var ingredient in Ingredients)
                         {
-                            <option value="@ingredient">@ingredient</option>
+                            <option value="@ingredient.Id">@ingredient.Name</option>
                         }
                     </select>
                     <button type="button" @onclick="AddIngredientToList"
@@ -279,31 +276,25 @@
                     }
                 </ul>
             </div>
+        </div>
 
-            <!-- Type -->
+        <!-- Right Column -->
+        <div class="w-1/2 flex flex-col space-y-4">
+            <!-- Recipe Name -->
             <div class="p-6 border border-gray-300 rounded-lg">
-                <label for="type" class="block mb-2 text-sm font-medium text-gray-900">Type</label>
-                <select id="type" @bind="ModifySelectedType"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
-                    <option value="">Select type</option>
-                    @foreach (var type in Types)
-                    {
-                        <option value="@type">@type</option>
-                    }
-                </select>
+                <label for="recipeName" class="block mb-2 text-sm font-medium text-gray-900">Name *</label>
+                <input type="text" id="recipeName" @bind="NewRecipeName"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 @(FieldErrors["recipeName"] ? "border-red-500" : "")"
+                       placeholder="Enter recipe name"/>
             </div>
 
-            <!-- Allergen -->
+            <!-- Recipe Description -->
             <div class="p-6 border border-gray-300 rounded-lg">
-                <label for="allergen" class="block mb-2 text-sm font-medium text-gray-900">Allergen</label>
-                <select id="allergen" @bind="ModifySelectedAllergen"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
-                    <option value="">Select allergen</option>
-                    @foreach (var allergen in Allergens)
-                    {
-                        <option value="@allergen">@allergen</option>
-                    }
-                </select>
+                <label for="recipeDescription" class="block mb-2 text-sm font-medium text-gray-900">Description
+                    *</label>
+                <textarea id="recipeDescription" @bind="NewRecipeDescription"
+                          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 h-48 @(FieldErrors["recipeDescription"] ? "border-red-500" : "")"
+                          placeholder="Enter recipe description"></textarea>
             </div>
         </div>
     </form>
@@ -312,7 +303,7 @@
     <div class="flex justify-end space-x-4 mt-4">
         <button type="button" @onclick="SaveModifiedRecipe"
                 class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
-            Save
+            Add
         </button>
         <button type="button" @onclick="CancelModifyRecipe"
                 class="bg-red-600 font-normal text-sm hover:bg-red-700 text-white py-2 px-4 rounded">
@@ -396,7 +387,6 @@
     private async Task NewRecipeDialog()
     {
         EditingRecipe = new Via.Dk.Recipe();
-
         NewRecipeName = string.Empty;
         NewRecipeDescription = string.Empty;
         NewRecipeIngredients = new List<string>();
@@ -623,8 +613,7 @@
     // Modify and Delete Recipe properties and methods
     private int SelectedRecipeId { get; set; }
     private string SelectedRecipeAction { get; set; }
-    private string ModifySelectedType { get; set; } = string.Empty;
-    private string ModifySelectedAllergen { get; set; } = string.Empty;
+    
 
     private Via.Dk.Recipe? EditingRecipe { get; set; } = null;
 
@@ -641,12 +630,7 @@
         else if (SelectedRecipeAction == "modify")
         {
             var recipe = Recipes.FirstOrDefault(r => r.Id == SelectedRecipeId);
-            if (recipe != null)
-            {
-                NewRecipeName = recipe.Name;
-                NewRecipeIngredients = new List<string>(recipe.Ingredients.Select(i => i.Id.ToString()).ToList());
-            }
-
+            EditingRecipe = recipe;
             await Js.InvokeVoidAsync("showDialog", "modifyRecipeDialog");
         }
     }
@@ -658,9 +642,8 @@
         // if (recipe != null)
         // {
         //     recipe.Name = NewRecipeName;
+        //    recipe.ImageLink = ImageLink;
         //     recipe.Ingredients = new List<int>(NewRecipeIngredients.Select(int.Parse).ToList());
-        //     recipe.Types = new List<string> { ModifySelectedType };
-        //     recipe.Allergens = new List<string> { ModifySelectedAllergen };
         // }
 
         await Js.InvokeVoidAsync("hideDialog", "modifyRecipeDialog");
