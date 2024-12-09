@@ -297,11 +297,11 @@ INSERT INTO selection (created_by_id, admin_week_id) VALUES
 (2, 1);
 
 -- Insert mock data for `recipe`
-INSERT INTO recipe (name) VALUES
-('Spaghetti Bolognese'),
-('Vegetable Stir Fry'),
-('Salmon Salad'),
-('Chicken Curry');  -- Added Chicken Curry recipe
+INSERT INTO recipe (name, description) VALUES
+('Spaghetti Bolognese', 'A classic Italian dish made with a rich tomato and meat sauce served over spaghetti.'),
+('Vegetable Stir Fry', 'A quick and healthy meal featuring a mix of fresh vegetables sautéed in a savory sauce.'),
+('Salmon Salad', 'A refreshing salad with grilled salmon, crisp greens, and a light vinaigrette dressing.'),
+('Chicken Curry', 'A flavorful and spicy curry made with tender chicken pieces, aromatic spices, and coconut milk.');
 
 -- Insert mock data for `ingredient`
 INSERT INTO ingredient (name, calories, is_allergen) VALUES
