@@ -15,11 +15,12 @@ public class RecipeDaoImpl implements IRecipeDao
   @Override public int create(CreateRecipeRequest recipe) throws SQLException
   {
     PreparedStatement statement = db.prepareStatement("""
-        insert into recipe (name, image_link) values (?, ?)
+        insert into recipe (name, image_link, description) values (?, ?, ?)
         returning id
         """);
     statement.setString(1, recipe.getName());
     statement.setString(2, recipe.getImageLink());
+    statement.setString(3, recipe.getDescription());
     ResultSet resultSet = statement.executeQuery();
     int newRecipeId = 0;
     if (resultSet.next()) {
@@ -100,6 +101,7 @@ public class RecipeDaoImpl implements IRecipeDao
         Timestamp creationDate = resultSet.getTimestamp("creation_date");
         Timestamp modificationDate = resultSet.getTimestamp("modification_date");
         String imageLink = resultSet.getString("image_link");
+        String description = resultSet.getString("description");
         Recipe.Builder recipe = Recipe.newBuilder()
             .setId(recipeId)
             .setName(recipeName)
@@ -108,6 +110,7 @@ public class RecipeDaoImpl implements IRecipeDao
             .setCalories(calories)
             .setCreationDate(TimeConverter.toProtobufTimestamp(creationDate))
             .setImageLink(imageLink == null ? " " : imageLink)
+            .setDescription(description)
             .addAllIngredients(ingredients);
         if (TimeConverter.toProtobufTimestamp(modificationDate) != null) {
           recipe.setModificationDate(TimeConverter.toProtobufTimestamp(modificationDate));
@@ -139,7 +142,8 @@ public class RecipeDaoImpl implements IRecipeDao
             type = ?,
             contains_allergen = ?,
             calories = ?,
-            image_link = ?
+            image_link = ?,
+            description = ?
             where id = ?
         """);
     statement.setString(1, recipe.getName());
@@ -147,7 +151,8 @@ public class RecipeDaoImpl implements IRecipeDao
     statement.setBoolean(3, false);
     statement.setInt(4, 0);
     statement.setString(5, recipe.getImageLink());
-    statement.setInt(6, recipe.getId());
+    statement.setString(6, recipe.getDescription());
+    statement.setInt(7, recipe.getId());
 
     status = statement.executeUpdate();
     boolean allSuccess = true;
@@ -173,7 +178,6 @@ public class RecipeDaoImpl implements IRecipeDao
       else {
         return 0;
       }
-
 
       int[] results = statement.executeBatch();
       for (int result : results) {
