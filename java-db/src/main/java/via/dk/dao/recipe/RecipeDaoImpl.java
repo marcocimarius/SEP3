@@ -71,7 +71,6 @@ public class RecipeDaoImpl implements IRecipeDao
         List<Ingredient> ingredients = new ArrayList<>();
         recipeStatement.setInt(1, recipeId);
         ResultSet ingredientsResultSet = recipeStatement.executeQuery();
-        //        if (!ingredientsResultSet.wasNull()) {
         while (ingredientsResultSet.next()) {
           int id = ingredientsResultSet.getInt("id");
           String name = ingredientsResultSet.getString("name");
@@ -93,7 +92,6 @@ public class RecipeDaoImpl implements IRecipeDao
           ingredient.build();
           ingredients.add(ingredient.build());
         }
-        //        }
 
         String recipeName = resultSet.getString("name");
         String type = resultSet.getString("type");
@@ -194,22 +192,45 @@ public class RecipeDaoImpl implements IRecipeDao
 
   @Override public int delete(DeleteRecipeRequest recipe) throws SQLException
   {
-    PreparedStatement statement = db.prepareStatement("""
+    try {
+      PreparedStatement statement = db.prepareStatement("""
+        delete from selection_recipe where recipe_id = ?
+        """);
+      statement.setInt(1, recipe.getId());
+      statement.executeUpdate();
+
+      statement = db.prepareStatement("""
+        delete from admin_week_recipes where recipe_id = ?
+        """);
+      statement.setInt(1, recipe.getId());
+      statement.executeUpdate();
+
+      statement = db.prepareStatement("""
         delete from recipes_with_ingredients where recipe_id = ?
         """);
-    statement.setInt(1, recipe.getId());
-    statement.executeUpdate();
+      statement.setInt(1, recipe.getId());
+      statement.executeUpdate();
 
-    statement = db.prepareStatement("""
+      statement = db.prepareStatement("""
          delete from recipe where id = ?
-    """);
-    statement.setInt(1, recipe.getId());
+      """);
+      statement.setInt(1, recipe.getId());
 
-    if (statement.executeUpdate() == 0) {
-      return 0;
-    }
-    else {
+      if (statement.executeUpdate() == 0) {
+        return 0;
+      }
+
       return 1;
+    }
+    catch (SQLException e) {
+      System.err.println("SQL Exception " + e.getMessage());
+      e.printStackTrace();
+      throw e;
+    }
+    catch (Exception e) {
+      System.err.println("Exception " + e.getMessage());
+      e.printStackTrace();
+      throw e;
     }
   }
 }
