@@ -72,7 +72,7 @@ create table recipe (
     calories int default 0,
     creation_date date DEFAULT CURRENT_DATE,
     modification_date date null,
-    image_link varchar(100),
+    image_link text,
     description text
 );
 
@@ -297,11 +297,12 @@ INSERT INTO selection (created_by_id, admin_week_id) VALUES
 (2, 1);
 
 -- Insert mock data for `recipe`
-INSERT INTO recipe (name, description) VALUES
-('Spaghetti Bolognese', 'A classic Italian dish made with a rich tomato and meat sauce served over spaghetti.'),
-('Vegetable Stir Fry', 'A quick and healthy meal featuring a mix of fresh vegetables sautéed in a savory sauce.'),
-('Salmon Salad', 'A refreshing salad with grilled salmon, crisp greens, and a light vinaigrette dressing.'),
-('Chicken Curry', 'A flavorful and spicy curry made with tender chicken pieces, aromatic spices, and coconut milk.');
+INSERT INTO recipe (name, image_link, description) VALUES
+('Spaghetti Bolognese', 'https://www.valdemarsro.dk/wp-content/2015/09/bolognese-1.jpg', 'A classic Italian dish made with a rich tomato and meat sauce served over spaghetti.'),
+('Vegetable Stir Fry', 'https://images.themodernproper.com/billowy-turkey/production/posts/VegetableStirFry_9.jpg?w=1200&h=1200&q=60&fm=jpg&fit=crop&dm=1703377301&s=3484d660c4b404c6d23b0c3ec7ac66eb', 'A quick and healthy meal featuring a mix of fresh vegetables sautéed in a savory sauce.'),
+('Salmon Salad', 'https://onebalancedlife.com/wp-content/uploads/2023/01/Salmon-Salad-scaled-720x720.jpg', 'A refreshing salad with grilled salmon, crisp greens, and a light vinaigrette dressing.'),
+('Chicken Curry', 'https://www.allrecipes.com/thmb/QcrNwbI0JvxdPwZ47m2bj2HY7ck=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/46822-Indian-Chicken-Curry-103301-2x1-1-41bd5b8de7ed476ea3c1fc023168cf39.jpg', 'A flavorful and spicy curry made with tender chicken pieces, aromatic spices, and coconut milk.');
+
 
 -- Insert mock data for `ingredient`
 INSERT INTO ingredient (name, calories, is_allergen) VALUES
