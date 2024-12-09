@@ -180,6 +180,7 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
           Timestamp creationDate = recipesResultSet.getTimestamp("creation_date");
           Timestamp modificationDate = recipesResultSet.getTimestamp("modification_date");
           String imageLink = recipesResultSet.getString("image_link");
+          String description = recipesResultSet.getString("description");
 
           PreparedStatement ingredientsStatement = db.prepareStatement("""
             select ingredient.*, t.type from ingredient
@@ -222,6 +223,7 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
               .setCalories(calories)
               .setCreationDate(TimeConverter.toProtobufTimestamp(creationDate))
               .setImageLink(imageLink == null ? " " : imageLink)
+              .setDescription(description)
               .addAllIngredients(ingredients);
 
           if (modificationDate != null) {

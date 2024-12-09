@@ -178,6 +178,7 @@ public class SelectionDaoImpl implements SelectionDao
           Timestamp creationDate = resultSet.getTimestamp("creation_date");
           Timestamp modificationDate = resultSet.getTimestamp("modification_date");
           String imageLink = resultSet.getString("image_link");
+          String description = resultSet.getString("description");
 
           PreparedStatement ingredientsStatement = db.prepareStatement("""
             select ingredient.*, t.type from ingredient
@@ -221,6 +222,7 @@ public class SelectionDaoImpl implements SelectionDao
               .setCalories(calories)
               .setCreationDate(TimeConverter.toProtobufTimestamp(creationDate))
               .setImageLink(imageLink == null ? " " : imageLink)
+              .setDescription(description)
               .addAllIngredients(ingredients);
 
           if (modificationDate != null) {

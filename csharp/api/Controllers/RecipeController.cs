@@ -37,7 +37,8 @@ public class RecipeController : ControllerBase
         {
             Name = recipe.Name,
             ImageLink = recipe.ImageLink,
-            IngredientsId = { recipe.IngredientsId }
+            IngredientsId = { recipe.IngredientsId },
+            Description = recipe.Description
         };
         Console.WriteLine(request);
         try
@@ -60,7 +61,8 @@ public class RecipeController : ControllerBase
             Id = recipe.RecipeId,
             Name = recipe.Name,
             ImageLink = recipe.ImageLink,
-            IngredientsId = { recipe.IngredientsIds }
+            IngredientsId = { recipe.IngredientsIds },
+            Description = recipe.Description
         };
         string response = await _grpcService.RecipesClient.UpdateRecipe(recipeRequest);
         if (response.ToLower().Contains("success"))

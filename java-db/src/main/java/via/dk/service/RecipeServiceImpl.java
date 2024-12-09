@@ -65,7 +65,8 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
             .setType(recipe.getType())
             .setContainsAllergen(recipe.getContainsAllergen())
             .setCalories(recipe.getCalories())
-            .setCreationDate(recipe.getCreationDate());
+            .setCreationDate(recipe.getCreationDate())
+            .setDescription(recipe.getDescription());
 
         if (recipe.hasModificationDate()) {
           recipeBuilder.setModificationDate(recipe.getModificationDate());

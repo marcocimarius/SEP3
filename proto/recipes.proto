@@ -15,6 +15,7 @@ message Recipe {
   google.protobuf.Timestamp modification_date = 7;
   string image_link = 8;
   repeated Ingredient ingredients = 9;
+  string description = 10;
 }
 
 
@@ -22,6 +23,7 @@ message CreateRecipeRequest {
   string name = 1;
   string image_link = 2;
   repeated int32 ingredients_id = 3;
+  string description = 4;
 }
 
 message UpdateRecipeRequest {
@@ -29,6 +31,7 @@ message UpdateRecipeRequest {
   string name = 2;
   string image_link = 3;
   repeated int32 ingredients_id = 4;
+  string description = 5;
 }
 
 message UpdateRecipeResponse {
