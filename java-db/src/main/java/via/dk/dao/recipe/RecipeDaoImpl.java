@@ -15,11 +15,12 @@ public class RecipeDaoImpl implements IRecipeDao
   @Override public int create(CreateRecipeRequest recipe) throws SQLException
   {
     PreparedStatement statement = db.prepareStatement("""
-        insert into recipe (name, image_link) values (?, ?)
+        insert into recipe (name, image_link, description) values (?, ?, ?)
         returning id
         """);
     statement.setString(1, recipe.getName());
     statement.setString(2, recipe.getImageLink());
+    statement.setString(3, recipe.getDescription());
     ResultSet resultSet = statement.executeQuery();
     int newRecipeId = 0;
     if (resultSet.next()) {
@@ -71,7 +72,6 @@ public class RecipeDaoImpl implements IRecipeDao
         List<Ingredient> ingredients = new ArrayList<>();
         recipeStatement.setInt(1, recipeId);
         ResultSet ingredientsResultSet = recipeStatement.executeQuery();
-        //        if (!ingredientsResultSet.wasNull()) {
         while (ingredientsResultSet.next()) {
           int id = ingredientsResultSet.getInt("id");
           String name = ingredientsResultSet.getString("name");
@@ -93,7 +93,6 @@ public class RecipeDaoImpl implements IRecipeDao
           ingredient.build();
           ingredients.add(ingredient.build());
         }
-        //        }
 
         String recipeName = resultSet.getString("name");
         String type = resultSet.getString("type");
@@ -102,6 +101,7 @@ public class RecipeDaoImpl implements IRecipeDao
         Timestamp creationDate = resultSet.getTimestamp("creation_date");
         Timestamp modificationDate = resultSet.getTimestamp("modification_date");
         String imageLink = resultSet.getString("image_link");
+        String description = resultSet.getString("description");
         Recipe.Builder recipe = Recipe.newBuilder()
             .setId(recipeId)
             .setName(recipeName)
@@ -110,6 +110,7 @@ public class RecipeDaoImpl implements IRecipeDao
             .setCalories(calories)
             .setCreationDate(TimeConverter.toProtobufTimestamp(creationDate))
             .setImageLink(imageLink == null ? " " : imageLink)
+            .setDescription(description)
             .addAllIngredients(ingredients);
         if (TimeConverter.toProtobufTimestamp(modificationDate) != null) {
           recipe.setModificationDate(TimeConverter.toProtobufTimestamp(modificationDate));
@@ -141,7 +142,8 @@ public class RecipeDaoImpl implements IRecipeDao
             type = ?,
             contains_allergen = ?,
             calories = ?,
-            image_link = ?
+            image_link = ?,
+            description = ?
             where id = ?
         """);
     statement.setString(1, recipe.getName());
@@ -149,7 +151,8 @@ public class RecipeDaoImpl implements IRecipeDao
     statement.setBoolean(3, false);
     statement.setInt(4, 0);
     statement.setString(5, recipe.getImageLink());
-    statement.setInt(6, recipe.getId());
+    statement.setString(6, recipe.getDescription());
+    statement.setInt(7, recipe.getId());
 
     status = statement.executeUpdate();
     boolean allSuccess = true;
@@ -176,7 +179,6 @@ public class RecipeDaoImpl implements IRecipeDao
         return 0;
       }
 
-
       int[] results = statement.executeBatch();
       for (int result : results) {
         if (result < 0) {
@@ -194,22 +196,45 @@ public class RecipeDaoImpl implements IRecipeDao
 
   @Override public int delete(DeleteRecipeRequest recipe) throws SQLException
   {
-    PreparedStatement statement = db.prepareStatement("""
+    try {
+      PreparedStatement statement = db.prepareStatement("""
+        delete from selection_recipe where recipe_id = ?
+        """);
+      statement.setInt(1, recipe.getId());
+      statement.executeUpdate();
+
+      statement = db.prepareStatement("""
+        delete from admin_week_recipes where recipe_id = ?
+        """);
+      statement.setInt(1, recipe.getId());
+      statement.executeUpdate();
+
+      statement = db.prepareStatement("""
         delete from recipes_with_ingredients where recipe_id = ?
         """);
-    statement.setInt(1, recipe.getId());
-    statement.executeUpdate();
+      statement.setInt(1, recipe.getId());
+      statement.executeUpdate();
 
-    statement = db.prepareStatement("""
+      statement = db.prepareStatement("""
          delete from recipe where id = ?
-    """);
-    statement.setInt(1, recipe.getId());
+      """);
+      statement.setInt(1, recipe.getId());
 
-    if (statement.executeUpdate() == 0) {
-      return 0;
-    }
-    else {
+      if (statement.executeUpdate() == 0) {
+        return 0;
+      }
+
       return 1;
+    }
+    catch (SQLException e) {
+      System.err.println("SQL Exception " + e.getMessage());
+      e.printStackTrace();
+      throw e;
+    }
+    catch (Exception e) {
+      System.err.println("Exception " + e.getMessage());
+      e.printStackTrace();
+      throw e;
     }
   }
 }

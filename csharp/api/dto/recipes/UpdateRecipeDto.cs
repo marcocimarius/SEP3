@@ -6,4 +6,5 @@ public class UpdateRecipeDto
     public string Name { get; set; }
     public string ImageLink { get; set; }
     public List<int> IngredientsIds { get; set; } 
+    public string Description { get; set; }
 }
