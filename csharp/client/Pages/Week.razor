@@ -1,26 +1,28 @@
 @page "/week"
 @inject HttpClient httpClient
 @inject IJSRuntime Js
+@inject AuthenticationStateProvider authProvider
 @using System.Globalization
 @using System.Text.Json
 @using BlazorApp1.Components
 @using DefaultNamespace
+@using Google.Protobuf.WellKnownTypes
 @using Via.Dk
 
 <AuthorizeView Roles="User">
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Weeks</h1>
     <div class="mb-4">
         <h2 class="text-lg font-semibold text-gray-700">
-            Selected Recipes: @string.Join(", ", SelectedRecipeIds)
+            Selected Recipes: @string.Join(", ", CurrentSelection.Recipes.Select(r => r.Id) ?? Array.Empty<int>())
         </h2>
         <p class="text-sm text-gray-600">
             (You can select up to 3 recipes)
         </p>
     </div>
     <h3>
-        @if (HasWeekPassed)
+        @if (HasWeekPassed || recipes == null || recipes.Count == 0)
         {
-            <span class="text-red-500">The selected week has passed</span>
+            <span class="text-red-500">No recipes found</span>
         }
     </h3>
     <div class="flex gap-3">
@@ -36,6 +38,12 @@
             Lock week
         </button>
     </div>
+    @if (CurrentSelection.WeekStartDate != null)
+    {
+        <div class="p-4 bg-green-100 text-green-700 rounded-md mb-6 mt-6">
+            <p class="font-medium">Week already selected and locked. 🎉</p>
+        </div>
+    }
     <div class="grid grid-cols-3 gap-4">
         @if (recipes != null && recipes.Count == 0)
         {
@@ -57,8 +65,8 @@
                     Id="@recipe.Id"
                     Selectable="true"
                     OnSelected="OnRecipeSelected"
-                    IsSelected="@SelectedRecipeIds.Contains(recipe.Id.ToString())"
-                    Disabled="@HasWeekPassed"
+                    IsSelected="@CurrentSelection.Recipes.Select(r => r.Id).Contains(recipe.Id)"
+                    Disabled="@(HasWeekPassed || CurrentSelection.WeekStartDate != null)"
                 />
             }
         }
@@ -77,6 +85,7 @@
 
 @code {
     public string? CurrentWeek { get; set; }
+    public NormalizedWeek CurrentSelection { get; set; } = new NormalizedWeek();
     private bool _hasWeekPassed;
 
     public bool HasWeekPassed
@@ -91,9 +100,6 @@
         set { this._hasWeekPassed = value; }
     }
 
-    private List<string> SelectedRecipeIds { get; set; } = new();
-    List<string> types = new List<string> { "Vegetarian", "Vegan", "Pescetarian", "Meateatrian" };
-    List<string> ingredients = new List<string> { "Pasta", "Minced Meat", "Parmezan" };
     List<Via.Dk.Recipe>? recipes = null;
 
     public async Task GetWeek(ChangeEventArgs e)
@@ -110,11 +116,32 @@
                 PropertyNameCaseInsensitive = true
             });
             this.recipes = new List<Via.Dk.Recipe>(res[0].Recipes.ToArray());
-            StateHasChanged();
         }
         catch (Exception ex)
         {
             this.recipes = new List<Via.Dk.Recipe>();
+            Console.WriteLine(ex);
+            throw;
+        }
+
+        try
+        {
+            var auth = await authProvider.GetAuthenticationStateAsync();
+            var userId = int.Parse(auth.User.Claims.First(c => String.Equals(c.Type, "Id")).Value);
+            var contentSelection = await httpClient.GetStringAsync("api/Selection?weekStartDate=" + startDate.ToString("o") + "&weekEndDate=" + endDate.ToString("o") + "&createdById=" + userId);
+            var resSelection = JsonSerializer.Deserialize<List<Via.Dk.Recipe>>(contentSelection, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            CurrentSelection.Recipes.Clear();
+            if (resSelection != null) CurrentSelection.Recipes.AddRange(resSelection);
+            Console.WriteLine(CurrentSelection.WeekStartDate == null);
+            CurrentSelection.WeekStartDate = startDate.ToUniversalTime().ToTimestamp();
+            CurrentSelection.WeekEndDate = endDate.ToUniversalTime().ToTimestamp();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
             StateHasChanged();
             Console.WriteLine(ex);
         }
@@ -129,49 +156,48 @@
 
     public async Task OnSubmit()
     {
-// var yearWeek = CurrentWeek.Split("-W");
-// var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
-// var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
-// var adminWeekSelection = new CreateAdminWeekSelectionRequest
-// {
-// WeekStartDate = Timestamp.FromDateTime(startDate.ToUniversalTime()),
-// WeekEndDate = Timestamp.FromDateTime(endDate.ToUniversalTime())
-// };
-// adminWeekSelection.RecipeIds.AddRange(SelectedRecipeIds.Select(int.Parse));
-// adminWeekSelection.CreatedById = authProvider.GetAuthenticationStateAsync().Id;
-// Console.WriteLine(CurrentAdminWeek);
-// if (CurrentAdminWeek == null)
-// {
-// var res = await httpClient.PostAsJsonAsync("api/AdminWeek", adminWeekSelection);
-// SuccessMessage();
-// return;
-// }
-//
-// var adminWeekSelectionChange = new UpdateAdminWeekSelectionRequest
-// {
-// AdminWeekId = CurrentAdminWeek.Id,
-// WeekStartDate = Timestamp.FromDateTime(startDate.ToUniversalTime()),
-// WeekEndDate = Timestamp.FromDateTime(endDate.ToUniversalTime())
-// };
-// adminWeekSelectionChange.RecipeIds.AddRange(SelectedRecipeIds.Select(int.Parse));
-// adminWeekSelectionChange.CreatedById = authProvider.GetAuthenticationStateAsync().Id;
-// var res2 = await httpClient.PutAsJsonAsync("api/AdminWeek", adminWeekSelectionChange);
-        await SuccessMessage();
+        var yearWeek = CurrentWeek.Split("-W");
+        var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
+        var adminWeeks = await httpClient.GetFromJsonAsync<List<NormalizedAdminWeek>>("api/AdminWeek?weekStartDate=" + startDate.ToUniversalTime().ToString("o") + "&weekEndDate=" + endDate.ToUniversalTime().ToString("o"));
+        var adminWeek = adminWeeks?[0];
+        if (adminWeek == null)
+        {
+            return;
+        }
+
+        this.recipes = new List<Via.Dk.Recipe>(adminWeek.Recipes);
+        var selection = new CreateSelectionRequest
+        {
+            AdminWeekId = adminWeek.Id,
+        };
+        selection.AdminWeekRecipesId.AddRange(this.CurrentSelection?.Recipes.Select(r => r.Id));
+
+        var auth = await authProvider.GetAuthenticationStateAsync();
+        var userId = int.Parse(auth.User.Claims.First(c => String.Equals(c.Type, "Id")).Value);
+        selection.CreatedById = userId;
+        if (CurrentSelection?.WeekStartDate == null)
+        {
+            await httpClient.PostAsJsonAsync("api/Selection", selection);
+            await SuccessMessage();
+        }
     }
 
     private void OnRecipeSelected(string id)
     {
-        if (SelectedRecipeIds.Contains(id))
+        var list = this.recipes;
+        if (list != null && CurrentSelection.Recipes.Select(r => r.Id).Contains(list.First(r => r.Id == int.Parse(id)).Id))
         {
             // If the recipe is already selected, remove it
-            SelectedRecipeIds.Remove(id);
+            Console.WriteLine(CurrentSelection.Recipes.Count);
+            CurrentSelection.Recipes.Remove(list.First(r => r.Id == int.Parse(id)));
         }
         else
         {
-            // Add recipe only if the limit is not reached
-            if (SelectedRecipeIds.Count < 3)
+            // Add recipe only if the limit is not reached 3
+            if (CurrentSelection?.Recipes.Count < 3)
             {
-                SelectedRecipeIds.Add(id);
+                CurrentSelection?.Recipes.Add(list.First(r => r.Id == int.Parse(id)));
             }
         }
     }

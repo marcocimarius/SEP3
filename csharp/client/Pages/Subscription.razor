@@ -1,4 +1,6 @@
 @page "/subscription"
+@inject AuthenticationStateProvider authProvider;
+@inject HttpClient httpClient;
 
 <AuthorizeView Roles="User">
     <Authorized>
@@ -45,9 +47,22 @@
 
     private async Task SubscribeAsync()
     {
+        var auth = await authProvider?.GetAuthenticationStateAsync();
+        var userId = auth.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
         // Replace with your subscription logic
+        var res = await httpClient.PostAsync("Subscription/" + userId + ":int", null);
         isSubscribed = true;
         Console.WriteLine("User has subscribed.");
     }
 
 }
+
+<script>
+    window.showDialog = (dialogId) => {
+        document.getElementById(dialogId).showModal();
+    };
+
+    window.hideDialog = (dialogId) => {
+        document.getElementById(dialogId).close();
+    };
+</script>

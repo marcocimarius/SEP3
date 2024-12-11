@@ -42,14 +42,17 @@ public class AuthProvider : AuthenticationStateProvider
         var serializedData = JsonSerializer.Serialize(loginResponse);
         await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser", serializedData);
 
-        List<Claim> claims = new List<Claim>
+        if (loginResponse != null)
         {
-            new Claim("Id", loginResponse.Id.ToString()),
-            new Claim("Email", loginResponse.Email),
-            new Claim("Role", loginResponse.IsAdmin ? "Admin" : "User")
-        };
-        ClaimsIdentity identity = new ClaimsIdentity(claims, "apiauth");
-        currentClaimsPrincipal = new ClaimsPrincipal(identity);
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim("Id", loginResponse.Id.ToString()),
+                new Claim("Email", loginResponse.Email),
+                new Claim("Role", loginResponse.IsAdmin ? "Admin" : "User")
+            };
+            ClaimsIdentity identity = new ClaimsIdentity(claims, "apiauth");
+            currentClaimsPrincipal = new ClaimsPrincipal(identity);
+        }
 
         NotifyAuthenticationStateChanged(
             Task.FromResult(new AuthenticationState(currentClaimsPrincipal)));

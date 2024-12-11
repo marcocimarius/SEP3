@@ -3,5 +3,5 @@
 public class UpdateSelectionDto
 {
     public int SelectionId { get; set; }
-    public List<int> AdminWeekRecipesIds { get; set; }
+    public List<int> AdminWeekRecipesId { get; set; }
 }

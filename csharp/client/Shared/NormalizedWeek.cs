@@ -6,7 +6,8 @@ namespace DefaultNamespace;
 
 public class NormalizedWeek
 {
-    public Timestamp WeekStartDate { get; set; }
-    public Timestamp WeekEndDate { get; set; }
-    public IEnumerable<Recipe> Recipes { get; set; }
+    public int Id { get; set; }
+    public Timestamp? WeekStartDate { get; set; }
+    public Timestamp? WeekEndDate { get; set; }
+    public List<Recipe> Recipes { get; set; } = new List<Recipe>();
 }
