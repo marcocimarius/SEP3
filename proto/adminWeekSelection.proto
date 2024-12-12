@@ -1,0 +1,60 @@
+﻿syntax = "proto3";
+option java_multiple_files = true;
+import "google/protobuf/timestamp.proto";
+import "recipes.proto";
+
+package via.dk;
+
+message CreateAdminWeekSelectionRequest {
+  int32 created_by_id = 1;
+  google.protobuf.Timestamp week_start_date = 2; 
+  google.protobuf.Timestamp week_end_date = 3; 
+  repeated int32 recipe_ids = 4;
+}
+
+message CreateAdminSelectionResponse {
+  string status = 1;
+}
+
+message DeleteAdminWeekSelectionRequest {
+  int32 admin_week_id = 1;
+}
+
+message DeleteAdminWeekSelectionResponse {
+  string status = 1;
+}
+
+message UpdateAdminWeekSelectionRequest {
+  int32 admin_week_id = 1;
+  int32 created_by_id = 2;
+  google.protobuf.Timestamp week_start_date = 3;
+  google.protobuf.Timestamp week_end_date = 4;
+  repeated int32 recipe_ids = 5;
+}
+
+message UpdateAdminWeekSelectionResponse {
+  string status = 1;
+}
+
+message RetrieveAdminWeekSelectionRequest {
+  google.protobuf.Timestamp week_start_date = 1;
+  google.protobuf.Timestamp week_end_date = 2;
+}
+
+message AdminWeek {
+  int32 id = 1;
+  repeated Recipe recipes = 2;
+  google.protobuf.Timestamp week_start_date = 3;
+  google.protobuf.Timestamp week_end_date = 4;
+}
+
+message RetrieveAdminWeekSelectionResponse {
+  repeated AdminWeek admin_weeks = 1;
+}
+
+service AdminWeekSelectionService {
+  rpc CreateAdminWeekSelection(CreateAdminWeekSelectionRequest) returns (CreateAdminSelectionResponse);
+  rpc DeleteAdminWeekSelection(DeleteAdminWeekSelectionRequest) returns (DeleteAdminWeekSelectionResponse); 
+  rpc UpdateAdminWeekSelection(UpdateAdminWeekSelectionRequest) returns (UpdateAdminWeekSelectionResponse);
+  rpc RetrieveAdminWeekSelection(RetrieveAdminWeekSelectionRequest) returns (RetrieveAdminWeekSelectionResponse);
+}

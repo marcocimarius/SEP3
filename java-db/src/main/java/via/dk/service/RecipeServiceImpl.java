@@ -4,7 +4,6 @@ import io.grpc.stub.StreamObserver;
 import via.dk.*;
 import via.dk.dao.recipe.IRecipeDao;
 import via.dk.dao.recipe.RecipeDaoImpl;
-import via.dk.model.recipe.Recipe;
 import via.dk.util.TimeConverter;
 
 import java.util.ArrayList;
@@ -21,7 +20,25 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
   @Override
   public void createRecipe(CreateRecipeRequest request,
       StreamObserver<CreateRecipeResponse> responseObserver) {
-    //needs more work
+    int status;
+    try {
+      status = recipeDao.create(request);
+      if (status == 0) {
+        throw new Exception("Fail creating the recipe itself, without adding ingredients");
+      }
+      else if (status == -1)
+      {
+        throw new Exception("Fail assigning ingredients to the recipe");
+      }
+      else {
+        CreateRecipeResponse.Builder response = CreateRecipeResponse.newBuilder().setStatus("SUCCESS. Recipe created");
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+      }
+    }
+    catch (Exception e) {
+      responseObserver.onError(e);
+    }
   }
 
   @Override
@@ -30,7 +47,7 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
     List<Recipe> recipes = new ArrayList<>();
     try {
       recipes = recipeDao.getAllRecipes();
-      if (recipes == null) {
+      if (recipes.isEmpty()) {
         //maybe the message structure should be restructured so that it supports a status message in case there are no recipes and then print this out on the site
         throw new Exception("FAIL: There are no recipes");
       }
@@ -46,20 +63,67 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
             .setId(recipe.getId())
             .setName(recipe.getName())
             .setType(recipe.getType())
-            .setContainsAllergen(recipe.isContainsAllergen())
+            .setContainsAllergen(recipe.getContainsAllergen())
             .setCalories(recipe.getCalories())
-            .setCreationDate(TimeConverter.toProtobufTimestamp(recipe.getCreationDate()));
+            .setCreationDate(recipe.getCreationDate())
+            .setDescription(recipe.getDescription());
 
-        if (recipe.getModificationDate() != null) {
-          recipeBuilder.setModificationDate(TimeConverter.toProtobufTimestamp(recipe.getModificationDate()));
+        if (recipe.hasModificationDate()) {
+          recipeBuilder.setModificationDate(recipe.getModificationDate());
         }
-
-        recipeBuilder.setImageLink(recipe.getImageLink() == null || recipe.getImageLink().isEmpty() ? "" : recipe.getImageLink());
+        recipeBuilder.setImageLink(recipe.getImageLink());
+        recipeBuilder.addAllIngredients(recipe.getIngredientsList());
 
         response.addRecipes(recipeBuilder.build());
       }
     }
     responseObserver.onNext(response.build());
     responseObserver.onCompleted();
+  }
+
+  @Override
+  public void updateRecipe(UpdateRecipeRequest request,
+      StreamObserver<UpdateRecipeResponse> responseObserver) {
+    try {
+      int status = recipeDao.update(request);
+      if (status == 0) {
+        throw new Exception("FAIL: Could not update the recipe itself, without the ingredients");
+      }
+      else if (status == -1)
+      {
+        throw new Exception("FAIL: Could not update the ingredients of the recipe");
+      }
+      else {
+        UpdateRecipeResponse.Builder response = UpdateRecipeResponse.newBuilder().setStatus("SUCCESS updating the recipe");
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+      }
+    }
+    catch (Exception e) {
+      responseObserver.onError(e);
+    }
+  }
+
+  @Override
+  public void deleteRecipe(DeleteRecipeRequest request,
+      StreamObserver<DeleteRecipeResponse> responseObserver) {
+    try {
+      int status = recipeDao.delete(request);
+      if (status == 0) {
+        throw new Exception("FAIL: Could not delete the recipe itself");
+      }
+      else if (status == -1)
+      {
+        throw new Exception("FAIL: Could not delete the ingredients of the recipe");
+      }
+      else {
+        DeleteRecipeResponse.Builder response = DeleteRecipeResponse.newBuilder().setStatus("SUCCESS deleting the recipe");
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+      }
+    }
+    catch (Exception e) {
+      responseObserver.onError(e);
+    }
   }
 }

@@ -1,4 +1,6 @@
-﻿using grpc;
+﻿using api.dto;
+using grpc;
+using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 using Via.Dk;
 
@@ -26,5 +28,60 @@ public class RecipeController : ControllerBase
         }
         
         return Results.Ok(recipes);
+    }
+
+    [HttpPost]
+    public async Task<IResult> AddRecipe([FromBody] CreateRecipeDto recipe)
+    {
+        CreateRecipeRequest request = new CreateRecipeRequest()
+        {
+            Name = recipe.Name,
+            ImageLink = recipe.ImageLink,
+            IngredientsId = { recipe.IngredientsId },
+            Description = recipe.Description
+        };
+        Console.WriteLine(request);
+        try
+        {
+            string response = await _grpcService.RecipesClient.CreateRecipe(request);
+            return response.ToLower().Contains("success") ? Results.Ok(response) : Results.Conflict(response);
+        }
+        catch (RpcException ex)
+        {
+            Console.WriteLine($"gRPC Error: {ex.Status.Detail}");
+            return Results.Problem($"gRPC Error: {ex.Status}");
+        }
+    }
+
+    [HttpPut]
+    public async Task<IResult> UpdateRecipe([FromBody] UpdateRecipeDto recipe)
+    {
+        UpdateRecipeRequest recipeRequest = new UpdateRecipeRequest()
+        {
+            Id = recipe.RecipeId,
+            Name = recipe.Name,
+            ImageLink = recipe.ImageLink,
+            IngredientsId = { recipe.IngredientsIds },
+            Description = recipe.Description
+        };
+        string response = await _grpcService.RecipesClient.UpdateRecipe(recipeRequest);
+        if (response.ToLower().Contains("success"))
+        {
+            return Results.Ok(response);
+        }
+        
+        return Results.Conflict(response);
+    }
+
+    [HttpDelete]
+    public async Task<IResult> DeleteRecipe([FromBody] DeleteRecipeRequest recipe)
+    {
+        string response = await _grpcService.RecipesClient.DeleteRecipe(recipe);
+        if (response.ToLower().Contains("success"))
+        {
+            return Results.Ok(response);
+        }
+
+        return Results.Conflict(response);
     }
 }

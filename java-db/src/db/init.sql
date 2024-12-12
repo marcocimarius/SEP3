@@ -1,11 +1,3 @@
-DROP TABLE IF EXISTS test;
-CREATE TABLE test
-(
-    id serial PRIMARY KEY,
-    name VARCHAR,
-    description VARCHAR
-);
-
 create table country(
     id serial primary key,
     name varchar(100)
@@ -80,7 +72,8 @@ create table recipe (
     calories int default 0,
     creation_date date DEFAULT CURRENT_DATE,
     modification_date date null,
-    image_link varchar(100)
+    image_link text,
+    description text
 );
 
 create table ingredient (
@@ -192,7 +185,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE TRIGGER trigger_update_recipe
-AFTER INSERT ON recipes_with_ingredients
+AFTER INSERT OR UPDATE ON recipes_with_ingredients
 FOR EACH ROW
 EXECUTE FUNCTION update_recipe_on_ingredient_add();
 
@@ -304,11 +297,12 @@ INSERT INTO selection (created_by_id, admin_week_id) VALUES
 (2, 1);
 
 -- Insert mock data for `recipe`
-INSERT INTO recipe (name) VALUES
-('Spaghetti Bolognese'),
-('Vegetable Stir Fry'),
-('Salmon Salad'),
-('Chicken Curry');  -- Added Chicken Curry recipe
+INSERT INTO recipe (name, image_link, description) VALUES
+('Spaghetti Bolognese', 'https://www.valdemarsro.dk/wp-content/2015/09/bolognese-1.jpg', 'A classic Italian dish made with a rich tomato and meat sauce served over spaghetti.'),
+('Vegetable Stir Fry', 'https://images.themodernproper.com/billowy-turkey/production/posts/VegetableStirFry_9.jpg?w=1200&h=1200&q=60&fm=jpg&fit=crop&dm=1703377301&s=3484d660c4b404c6d23b0c3ec7ac66eb', 'A quick and healthy meal featuring a mix of fresh vegetables sautéed in a savory sauce.'),
+('Salmon Salad', 'https://onebalancedlife.com/wp-content/uploads/2023/01/Salmon-Salad-scaled-720x720.jpg', 'A refreshing salad with grilled salmon, crisp greens, and a light vinaigrette dressing.'),
+('Chicken Curry', 'https://www.allrecipes.com/thmb/QcrNwbI0JvxdPwZ47m2bj2HY7ck=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/46822-Indian-Chicken-Curry-103301-2x1-1-41bd5b8de7ed476ea3c1fc023168cf39.jpg', 'A flavorful and spicy curry made with tender chicken pieces, aromatic spices, and coconut milk.');
+
 
 -- Insert mock data for `ingredient`
 INSERT INTO ingredient (name, calories, is_allergen) VALUES
@@ -360,9 +354,6 @@ INSERT INTO selection_recipe (recipe_id, selection_id) VALUES
 (3, 1),
 (4, 1);  -- Bind all recipes to the customer week
 
-
-select * from recipe;
-
 drop trigger trg_check_recipe_in_admin_week on selection_recipe;
 drop trigger trigger_update_recipe on recipes_with_ingredients;
 drop trigger trg_check_cancel_date on selection;
@@ -386,5 +377,3 @@ drop table registration;
 drop table address;
 drop table city;
 drop table country;
-
-select * from registration;
