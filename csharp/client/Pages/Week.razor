@@ -120,6 +120,7 @@ public async Task GetWeek(ChangeEventArgs e)
     catch (Exception ex)
     {
         this.recipes = new List<Via.Dk.Recipe>();
+        this.CurrentSelection.WeekStartDate = null;
         Console.WriteLine(ex);
         throw;
     }
@@ -179,6 +180,7 @@ public async Task OnSubmit()
     if (CurrentSelection?.WeekStartDate == null)
     {
         await httpClient.PostAsJsonAsync("api/Selection", selection);
+        CurrentSelection.WeekStartDate = startDate.ToUniversalTime().ToTimestamp();
         await SuccessMessage();
     }
 }
