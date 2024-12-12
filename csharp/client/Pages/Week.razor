@@ -55,152 +55,152 @@
         {
             @foreach (var recipe in recipes)
             {
-                <RecipeCard
-                    @key="recipe.Id"
-                    ImageUrl="@recipe.ImageLink"
-                    Title="@recipe.Name"
-                    Description="Often we eat the vegetables while the meat sauce simmers in the pan. Then I peel a large bowl of carrots and cut bell pepper, broccoli florets, cucumbers and tomato - so it becomes a snack, so that the vegetable depot is already well filled when dinner is served. If you want, you can also cleverly sneak a grated carrot or squash into this meat sauce, no one will notice anyway."
-                    Type="@recipe.Type"
-                    Ingredients="recipe.Ingredients.Select(i => i.Name).ToList()"
-                    Id="@recipe.Id"
-                    Selectable="true"
-                    OnSelected="OnRecipeSelected"
-                    IsSelected="@CurrentSelection.Recipes.Select(r => r.Id).Contains(recipe.Id)"
-                    Disabled="@(HasWeekPassed || CurrentSelection.WeekStartDate != null)"
-                />
-            }
+            <RecipeCard
+                @key="recipe.Id"
+                ImageUrl="@recipe.ImageLink"
+                Title="@recipe.Name"
+                Description="@recipe.Description"
+                Type="@recipe.Type"
+                Ingredients="recipe.Ingredients.Select(i => i.Name).ToList()"
+                Id="@recipe.Id"
+                Selectable="true"
+                OnSelected="OnRecipeSelected"
+                IsSelected="@CurrentSelection.Recipes.Select(r => r.Id).Contains(recipe.Id)"
+                Disabled="@(HasWeekPassed || CurrentSelection.WeekStartDate != null)"
+            />
         }
-    </div>
-    <!-- Success Dialog -->
-    <dialog id="successDialog" class="rounded-lg p-6 bg-white shadow-lg w-1/3">
-        <div class="flex flex-col space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xl font-bold">Success</h3>
-            </div>
-            <p>Week saved and will be delivered soon!</p>
+    }
+</div>
+<!-- Success Dialog -->
+<dialog id="successDialog" class="rounded-lg p-6 bg-white shadow-lg w-1/3">
+    <div class="flex flex-col space-y-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold">Success</h3>
         </div>
-    </dialog>
+        <p>Week saved and will be delivered soon!</p>
+    </div>
+</dialog>
 </AuthorizeView>
 
 
 @code {
-    public string? CurrentWeek { get; set; }
-    public NormalizedWeek CurrentSelection { get; set; } = new NormalizedWeek();
-    private bool _hasWeekPassed;
+public string? CurrentWeek { get; set; }
+public NormalizedWeek CurrentSelection { get; set; } = new NormalizedWeek();
+private bool _hasWeekPassed;
 
-    public bool HasWeekPassed
+public bool HasWeekPassed
+{
+    get
     {
-        get
-        {
-            if (CurrentWeek == null) return false;
-            var yearWeek = CurrentWeek.Split("-W");
-            var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
-            return startDate < DateTime.Now;
-        }
-        set { this._hasWeekPassed = value; }
-    }
-
-    List<Via.Dk.Recipe>? recipes = null;
-
-    public async Task GetWeek(ChangeEventArgs e)
-    {
-        CurrentWeek = e.Value?.ToString();
+        if (CurrentWeek == null) return false;
         var yearWeek = CurrentWeek.Split("-W");
         var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
-        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
-        try
-        {
-            var content = await httpClient.GetStringAsync("api/AdminWeek?weekStartDate=" + startDate.ToString("o") + "&weekEndDate=" + endDate.ToString("o"));
-            var res = JsonSerializer.Deserialize<List<NormalizedWeek>>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-            this.recipes = new List<Via.Dk.Recipe>(res[0].Recipes.ToArray());
-        }
-        catch (Exception ex)
-        {
-            this.recipes = new List<Via.Dk.Recipe>();
-            Console.WriteLine(ex);
-            throw;
-        }
+        return startDate < DateTime.Now;
+    }
+    set { this._hasWeekPassed = value; }
+}
 
-        try
+List<Via.Dk.Recipe>? recipes = null;
+
+public async Task GetWeek(ChangeEventArgs e)
+{
+    CurrentWeek = e.Value?.ToString();
+    var yearWeek = CurrentWeek.Split("-W");
+    var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+    var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
+    try
+    {
+        var content = await httpClient.GetStringAsync("api/AdminWeek?weekStartDate=" + startDate.ToString("o") + "&weekEndDate=" + endDate.ToString("o"));
+        var res = JsonSerializer.Deserialize<List<NormalizedWeek>>(content, new JsonSerializerOptions
         {
-            var auth = await authProvider.GetAuthenticationStateAsync();
-            var userId = int.Parse(auth.User.Claims.First(c => String.Equals(c.Type, "Id")).Value);
-            var contentSelection = await httpClient.GetStringAsync("api/Selection?weekStartDate=" + startDate.ToString("o") + "&weekEndDate=" + endDate.ToString("o") + "&createdById=" + userId);
-            var resSelection = JsonSerializer.Deserialize<List<Via.Dk.Recipe>>(contentSelection, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-            CurrentSelection.Recipes.Clear();
-            if (resSelection != null) CurrentSelection.Recipes.AddRange(resSelection);
-            Console.WriteLine(CurrentSelection.WeekStartDate == null);
-            CurrentSelection.WeekStartDate = startDate.ToUniversalTime().ToTimestamp();
-            CurrentSelection.WeekEndDate = endDate.ToUniversalTime().ToTimestamp();
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            StateHasChanged();
-            Console.WriteLine(ex);
-        }
+            PropertyNameCaseInsensitive = true
+        });
+        this.recipes = new List<Via.Dk.Recipe>(res[0].Recipes.ToArray());
+    }
+    catch (Exception ex)
+    {
+        this.recipes = new List<Via.Dk.Recipe>();
+        Console.WriteLine(ex);
+        throw;
     }
 
-    private async Task SuccessMessage()
+    try
     {
-        await Js.InvokeVoidAsync("showDialog", "successDialog");
-        await Task.Delay(2000);
-        await Js.InvokeVoidAsync("hideDialog", "successDialog");
-    }
-
-    public async Task OnSubmit()
-    {
-        var yearWeek = CurrentWeek.Split("-W");
-        var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
-        var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
-        var adminWeeks = await httpClient.GetFromJsonAsync<List<NormalizedAdminWeek>>("api/AdminWeek?weekStartDate=" + startDate.ToUniversalTime().ToString("o") + "&weekEndDate=" + endDate.ToUniversalTime().ToString("o"));
-        var adminWeek = adminWeeks?[0];
-        if (adminWeek == null)
-        {
-            return;
-        }
-
-        this.recipes = new List<Via.Dk.Recipe>(adminWeek.Recipes);
-        var selection = new CreateSelectionRequest
-        {
-            AdminWeekId = adminWeek.Id,
-        };
-        selection.AdminWeekRecipesId.AddRange(this.CurrentSelection?.Recipes.Select(r => r.Id));
-
         var auth = await authProvider.GetAuthenticationStateAsync();
         var userId = int.Parse(auth.User.Claims.First(c => String.Equals(c.Type, "Id")).Value);
-        selection.CreatedById = userId;
-        if (CurrentSelection?.WeekStartDate == null)
+        var contentSelection = await httpClient.GetStringAsync("api/Selection?weekStartDate=" + startDate.ToString("o") + "&weekEndDate=" + endDate.ToString("o") + "&createdById=" + userId);
+        var resSelection = JsonSerializer.Deserialize<List<Via.Dk.Recipe>>(contentSelection, new JsonSerializerOptions
         {
-            await httpClient.PostAsJsonAsync("api/Selection", selection);
-            await SuccessMessage();
-        }
+            PropertyNameCaseInsensitive = true
+        });
+        CurrentSelection.Recipes.Clear();
+        if (resSelection != null) CurrentSelection.Recipes.AddRange(resSelection);
+        Console.WriteLine(CurrentSelection.WeekStartDate == null);
+        CurrentSelection.WeekStartDate = startDate.ToUniversalTime().ToTimestamp();
+        CurrentSelection.WeekEndDate = endDate.ToUniversalTime().ToTimestamp();
+        StateHasChanged();
+    }
+    catch (Exception ex)
+    {
+        StateHasChanged();
+        Console.WriteLine(ex);
+    }
+}
+
+private async Task SuccessMessage()
+{
+    await Js.InvokeVoidAsync("showDialog", "successDialog");
+    await Task.Delay(2000);
+    await Js.InvokeVoidAsync("hideDialog", "successDialog");
+}
+
+public async Task OnSubmit()
+{
+    var yearWeek = CurrentWeek.Split("-W");
+    var startDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Monday);
+    var endDate = ISOWeek.ToDateTime(int.Parse(yearWeek[0]), int.Parse(yearWeek[1]), DayOfWeek.Sunday);
+    var adminWeeks = await httpClient.GetFromJsonAsync<List<NormalizedAdminWeek>>("api/AdminWeek?weekStartDate=" + startDate.ToUniversalTime().ToString("o") + "&weekEndDate=" + endDate.ToUniversalTime().ToString("o"));
+    var adminWeek = adminWeeks?[0];
+    if (adminWeek == null)
+    {
+        return;
     }
 
-    private void OnRecipeSelected(string id)
+    this.recipes = new List<Via.Dk.Recipe>(adminWeek.Recipes);
+    var selection = new CreateSelectionRequest
     {
-        var list = this.recipes;
-        if (list != null && CurrentSelection.Recipes.Select(r => r.Id).Contains(list.First(r => r.Id == int.Parse(id)).Id))
+        AdminWeekId = adminWeek.Id,
+    };
+    selection.AdminWeekRecipesId.AddRange(this.CurrentSelection?.Recipes.Select(r => r.Id));
+
+    var auth = await authProvider.GetAuthenticationStateAsync();
+    var userId = int.Parse(auth.User.Claims.First(c => String.Equals(c.Type, "Id")).Value);
+    selection.CreatedById = userId;
+    if (CurrentSelection?.WeekStartDate == null)
+    {
+        await httpClient.PostAsJsonAsync("api/Selection", selection);
+        await SuccessMessage();
+    }
+}
+
+private void OnRecipeSelected(string id)
+{
+    var list = this.recipes;
+    if (list != null && CurrentSelection.Recipes.Select(r => r.Id).Contains(list.First(r => r.Id == int.Parse(id)).Id))
+    {
+        // If the recipe is already selected, remove it
+        Console.WriteLine(CurrentSelection.Recipes.Count);
+        CurrentSelection.Recipes.Remove(list.First(r => r.Id == int.Parse(id)));
+    }
+    else
+    {
+        // Add recipe only if the limit is not reached 3
+        if (CurrentSelection?.Recipes.Count < 3)
         {
-            // If the recipe is already selected, remove it
-            Console.WriteLine(CurrentSelection.Recipes.Count);
-            CurrentSelection.Recipes.Remove(list.First(r => r.Id == int.Parse(id)));
-        }
-        else
-        {
-            // Add recipe only if the limit is not reached 3
-            if (CurrentSelection?.Recipes.Count < 3)
-            {
-                CurrentSelection?.Recipes.Add(list.First(r => r.Id == int.Parse(id)));
-            }
+            CurrentSelection?.Recipes.Add(list.First(r => r.Id == int.Parse(id)));
         }
     }
+}
 
 }
 
