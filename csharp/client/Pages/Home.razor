@@ -8,9 +8,14 @@
         <div class="hero-card">
             <h1 class="header-title"><span class="highlight">ByeByeRotten</span></h1>
             <p class="header-subtitle">Discover recipes that make your life delicious and healthy.</p>
-            <AuthorizeView>
+            <AuthorizeView Roles="Admin">
                 <Authorized>
                     <NavLink href="/recipes" class="cta-button">Explore Recipes</NavLink>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="User">
+                <Authorized>
+                    <NavLink href="/week" class="cta-button">Explore Week</NavLink>
                 </Authorized>
             </AuthorizeView>
         </div>

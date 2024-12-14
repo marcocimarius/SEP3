@@ -58,10 +58,10 @@ public class RecipeController : ControllerBase
     {
         UpdateRecipeRequest recipeRequest = new UpdateRecipeRequest()
         {
-            Id = recipe.RecipeId,
+            Id = recipe.Id,
             Name = recipe.Name,
             ImageLink = recipe.ImageLink,
-            IngredientsId = { recipe.IngredientsIds },
+            IngredientsId = { recipe.IngredientsId },
             Description = recipe.Description
         };
         string response = await _grpcService.RecipesClient.UpdateRecipe(recipeRequest);

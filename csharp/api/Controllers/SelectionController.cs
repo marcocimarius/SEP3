@@ -6,7 +6,7 @@ using Via.Dk;
 namespace api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class SelectionController : ControllerBase
 {
     private readonly GrpcClient _grpcService;
@@ -41,7 +41,7 @@ public class SelectionController : ControllerBase
         {
             AdminWeekId = dto.AdminWeekId,
             CreatedById = dto.CreatedById,
-            AdminWeekRecipesId = { dto.AdminWeekRecipesIds }
+            AdminWeekRecipesId = { dto.AdminWeekRecipesId }
         };
         if ((await _grpcService.SelectionClient.Create(request)).ToLower().Contains("success"))
         {
@@ -57,7 +57,7 @@ public class SelectionController : ControllerBase
         UpdateSelectionRequest request = new UpdateSelectionRequest()
         {
             SelectionId = dto.SelectionId,
-            RecipeIds = { dto.AdminWeekRecipesIds }
+            RecipeIds = { dto.AdminWeekRecipesId }
         };
 
         if ((await _grpcService.SelectionClient.Update(request)).ToLower().Contains("success"))

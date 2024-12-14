@@ -3,6 +3,7 @@
 @using System.Text
 @using System.Text.Json
 @using BlazorApp1.Components
+@using DefaultNamespace
 @using Via.Dk
 @inject IJSRuntime Js
 @attribute [Authorize]
@@ -144,9 +145,10 @@
                     <label for="recipeIngredients"
                            class="block mb-2 text-sm font-medium text-gray-900">Ingredients</label>
                     <div class="flex items-center space-x-2">
-                        <select id="recipeIngredients" @bind="SelectedIngredient"
+                        <select id="recipeIngredients" @bind="NewRecipeSelectedIngredient"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 mr-2 @(FieldErrors["selectedIngredient"] ? "border-red-500" : "")">
                             <option value="">Select ingredient</option>
+                            HEREE
                             @foreach (var ingredient in Ingredients)
                             {
                                 <option value="@ingredient.Id">@ingredient.Name</option>
@@ -158,10 +160,10 @@
                         </button>
                     </div>
                     <ul class="mt-2 list-disc list-inside">
-                        @* @foreach (var ingredient in NewRecipeIngredients) *@
-                        @* { *@
-                        @*     <li>@ingredient</li> *@
-                        @* } *@
+                        @foreach (var ingredient in NewRecipeIngredients)
+                        {
+                            <li>@ingredient</li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -264,7 +266,7 @@
                     <label for="recipeIngredients"
                            class="block mb-2 text-sm font-medium text-gray-900">Ingredients</label>
                     <div class="flex items-center space-x-2">
-                        <select id="recipeIngredients" @bind="SelectedIngredient"
+                        <select id="recipeIngredients" @bind="ModifyRecipeSelectedIngredient"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 mr-2 @(FieldErrors["selectedIngredient"] ? "border-red-500" : "")">
                             <option value="">Select ingredient</option>
                             @foreach (var ingredient in Ingredients)
@@ -272,7 +274,7 @@
                                 <option value="@ingredient.Id">@ingredient.Name</option>
                             }
                         </select>
-                        <button type="button" @onclick="AddIngredientToList"
+                        <button type="button" @onclick="AddIngredientToEditingRecipe"
                                 class="bg-green-600 font-normal text-sm hover:bg-green-700 text-white py-2 px-4 rounded">
                             Add
                         </button>
@@ -300,7 +302,7 @@
                 <div class="p-6 border border-gray-300 rounded-lg">
                     <label for="recipeDescription" class="block mb-2 text-sm font-medium text-gray-900">Description
                         *</label>
-                    <textarea id="recipeDescription" @bind="NewRecipeDescription"
+                    <textarea id="recipeDescription" @bind="EditingRecipe.Description"
                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 h-48 @(FieldErrors["recipeDescription"] ? "border-red-500" : "")"
                               placeholder="Enter recipe description"></textarea>
                 </div>
@@ -350,7 +352,7 @@
                 <RecipeCard
                     ImageUrl="@recipe.ImageLink"
                     Title="@recipe.Name"
-                    Description="Some nice description for each recipe here, I think we should have it in the db"
+                    Description="@recipe.Description"
                     Type="@recipe.Type"
                     Ingredients="@recipe.Ingredients.Select(i => i.Name).ToList()"
                     Editable="true"
@@ -366,16 +368,23 @@
 @code {
     private string NewRecipeName { get; set; } = string.Empty;
     private string NewRecipeDescription { get; set; } = string.Empty;
-    private string SelectedIngredient { get; set; } = string.Empty;
+    private string NewRecipeSelectedIngredient { get; set; } = string.Empty;
     private List<string> NewRecipeIngredients { get; set; } = new List<string>();
     private bool IsRecipeDialog { get; set; } = false;
 
     private void AddIngredientToList()
     {
-        if (!string.IsNullOrEmpty(SelectedIngredient) && !NewRecipeIngredients.Contains(SelectedIngredient))
+        if (!string.IsNullOrEmpty(NewRecipeSelectedIngredient) && !NewRecipeIngredients.Contains(NewRecipeSelectedIngredient))
         {
-            NewRecipeIngredients.Add(SelectedIngredient);
+            NewRecipeIngredients.Add(NewRecipeSelectedIngredient);
+            StateHasChanged();
         }
+    }
+
+    private void AddIngredientToEditingRecipe()
+    {
+        var ing = this.Ingredients.FirstOrDefault(i => i.Id == int.Parse(ModifyRecipeSelectedIngredient));
+        EditingRecipe.Ingredients.Add(ing);
     }
 
     private void ValidateRecipeFields()
@@ -393,7 +402,7 @@
 
     private async Task NewRecipeDialog()
     {
-        EditingRecipe = new Via.Dk.Recipe();
+        EditingRecipe = new NormalizedRecipe();
         NewRecipeName = string.Empty;
         NewRecipeDescription = string.Empty;
         NewRecipeIngredients = new List<string>();
@@ -443,7 +452,7 @@
     }
 
     // filter based on filter fields
-    private List<Via.Dk.Recipe> FilteredRecipes => Recipes
+    private List<NormalizedRecipe> FilteredRecipes => Recipes
         .Where(r => string.IsNullOrWhiteSpace(SearchText) || r.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
         .Where(r => string.IsNullOrWhiteSpace(SelectedType) || r.Type == SelectedType)
         .Where(r => string.IsNullOrWhiteSpace(SelectedAllergen))
@@ -452,7 +461,7 @@
 
     private async Task GetRecipes()
     {
-        var newRecipes = await httpClient.GetFromJsonAsync<IEnumerable<Via.Dk.Recipe>>("api/Recipe/allRecipes");
+        var newRecipes = await httpClient.GetFromJsonAsync<IEnumerable<NormalizedRecipe>>("api/Recipe/allRecipes");
         if (newRecipes != null) Recipes = [..newRecipes];
         StateHasChanged();
     }
@@ -463,6 +472,7 @@
         {
             Name = NewRecipeName,
             ImageLink = ImageLink,
+            Description = NewRecipeDescription,
             IngredientsId = { NewRecipeIngredients.Select(int.Parse).ToList() }
         });
     }
@@ -485,7 +495,7 @@
         StateHasChanged();
     }
 
-    private List<Via.Dk.Recipe> Recipes = new List<Via.Dk.Recipe>
+    private List<NormalizedRecipe> Recipes = new List<NormalizedRecipe>
     {
     };
 
@@ -622,7 +632,8 @@
     private string SelectedRecipeAction { get; set; }
 
 
-    private Via.Dk.Recipe? EditingRecipe { get; set; } = new Via.Dk.Recipe();
+    private NormalizedRecipe? EditingRecipe { get; set; } = new NormalizedRecipe();
+    private string ModifyRecipeSelectedIngredient { get; set; } = string.Empty;
 
     private async Task OnRecipeSelected(string action)
     {
@@ -645,15 +656,18 @@
     // Modify Recipe methods
     private async Task SaveModifiedRecipe()
     {
-        var recipe = Recipes.FirstOrDefault(r => r.Id == SelectedRecipeId);
-        // if (recipe != null)
-        // {
-        //     recipe.Name = NewRecipeName;
-        //    recipe.ImageLink = ImageLink;
-        //     recipe.Ingredients = new List<int>(NewRecipeIngredients.Select(int.Parse).ToList());
-        // }
+        var req = new UpdateRecipeRequest
+        {
+            Id = EditingRecipe.Id,
+            Name = EditingRecipe.Name,
+            Description = EditingRecipe.Description,
+            ImageLink = EditingRecipe.ImageLink,
+            IngredientsId = { this.EditingRecipe.Ingredients.Select(i => i.Id).ToList() }
+        };
 
+        await httpClient.PutAsJsonAsync("api/Recipe", req);
         await Js.InvokeVoidAsync("hideDialog", "modifyRecipeDialog");
+        await GetRecipes();
         StateHasChanged();
     }
 
@@ -697,7 +711,7 @@
         NewRecipeIngredients.Clear();
         NewRecipeSelectedType = string.Empty;
         NewRecipeSelectedAllergen = string.Empty;
-        SelectedIngredient = string.Empty;
+        NewRecipeSelectedIngredient = string.Empty;
     }
 
 }
