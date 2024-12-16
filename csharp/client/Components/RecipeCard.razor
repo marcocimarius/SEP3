@@ -1,3 +1,9 @@
+@using DefaultNamespace
+@using Microsoft.AspNetCore.Components
+@using Via.Dk
+@inject RecipeInformationService recipeService;
+<div class="rounded overflow-hidden shadow-lg">
+    <img class="w-full" src="@ImageUrl" alt="Sunset in the mountains">
 @using BlazorApp1.Pages
 @using Recipe = Via.Dk.Recipe
 <div tabindex="@GetTabIndex()" aria-label="@GetLabel()"
@@ -24,12 +30,30 @@
             @foreach (string ing in Ingredients)
             {
                 <span class="first-of-type:hidden">•</span>
+                <li
+                    class="">@ing</li>
                 <li class="">@ing</li>
             }
         </ul>
-        <hr class="border-gray-200 mb-3"/>
+        <hr class="border-gray-200 mb-3" />
         <p class="text-gray-700 text-base mb-3">@Description</p>
         <div class="flex gap-2 mb-3 flex-wrap">
+            @foreach (string type in Types)
+            {
+                <span
+                    class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">@type</span>
+            }
+        </div>
+        @if(Editable){
+            <div class="flex justify-end gap-2 w-full">
+                <button class="bg-yellow-500 font-normal text-sm hover:bg-yellow-600 text-white py-2 px-4 rounded">Edit</button>
+                <button class="bg-red-600 font-normal text-sm hover:bg-red-600 text-white py-2 px-4 rounded">Delete</button>
+            </div>
+        }
+        @if(Selectable){
+        <div class="flex justify-end gap-2 w-full">
+            <button type="button" class="focus:outline-none bg-purple-400 hover:bg-purple-400 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-400 dark:hover:bg-purple-500 dark:focus:ring-purple-700" @onclick="onSelected">Select</button>
+        </div>
             <span
                 class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">@Type</span>
         </div>
@@ -54,6 +78,15 @@
     [Parameter] public bool Editable { get; set; } = false;
     [Parameter] public string Type { get; set; }
     [Parameter] public IReadOnlyList<string> Ingredients { get; set; }
+
+    public void onSelected()
+    {
+        if (recipeService.IsButtonClicked)
+        {
+            recipeService.SetTitle(Title);
+        }
+    }
+}
     [Parameter] public IReadOnlyList<string> Allergens { get; set; }
     [Parameter] public EventCallback<string> OnSelected { get; set; }
     [Parameter] public bool Selectable { get; set; } = false;
