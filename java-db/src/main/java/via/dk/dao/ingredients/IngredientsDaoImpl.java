@@ -8,10 +8,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data access object for the IngredientModel object.
+ */
 public class IngredientsDaoImpl implements IIngredientsDao
 {
   private final Connection db = DatabaseConnection.getConnection();
 
+  /** Method to create a new ingredient.
+   * @param ingredient The ingredient object.
+   * @param typeId The type id of the ingredient.
+   * @return The number of rows affected.
+   * @throws SQLException
+   */
   @Override public int createIngredient(IngredientModel ingredient, int typeId)
       throws SQLException
   {
@@ -58,6 +67,12 @@ public class IngredientsDaoImpl implements IIngredientsDao
     return 1;
   }
 
+  /** Method to update an ingredient.
+   * @param ingredient The ingredient object.
+   * @param typeId The type id of the ingredient.
+   * @return The number of rows affected.
+   * @throws SQLException
+   */
   @Override public int updateIngredient(IngredientModel ingredient, int typeId)
       throws SQLException
   {
@@ -93,6 +108,11 @@ public class IngredientsDaoImpl implements IIngredientsDao
     return 1;
   }
 
+  /** Method to delete an ingredient.
+   * @param ingredient The ingredient object.
+   * @return The number of rows affected.
+   * @throws SQLException
+   */
   @Override public int deleteIngredient(DeleteIngredientDto ingredient)
       throws SQLException
   {
@@ -116,6 +136,10 @@ public class IngredientsDaoImpl implements IIngredientsDao
     return 1;
   }
 
+  /** Method to get all ingredients.
+   * @return A list of all ingredients.
+   * @throws SQLException
+   */
   @Override public List<IngredientModel> getAllIngredients() throws SQLException
   {
     PreparedStatement statement = db.prepareStatement("""

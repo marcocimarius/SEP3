@@ -8,10 +8,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of the AdminWeekSelectionDao interface.
+ */
 public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
 {
   private final Connection db = DatabaseConnection.getConnection();
 
+	/**
+	 * Creates an admin week selection.
+	 * @param request The request to create an admin week selection.
+	 * @return 1 if the admin week selection was created successfully, 0 otherwise.
+	 * @throws SQLException If an SQL exception occurred.
+	 */
   @Override public int createAdminWeekSelection(
       CreateAdminWeekSelectionRequest request) throws SQLException
   {
@@ -60,6 +69,12 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
     return 1;
   }
 
+  /**
+   * Deletes an admin week selection.
+   * @param request The request to delete an admin week selection.
+   * @return 1 if the admin week selection was deleted successfully, 0 otherwise.
+   * @throws SQLException If an SQL exception occurred.
+   */
   @Override public int deleteAdminWeekSelection(
       DeleteAdminWeekSelectionRequest request) throws SQLException
   {
@@ -82,6 +97,12 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
     return 0;
   }
 
+  /**
+   * Updates an admin week selection.
+   * @param request The request to update an admin week selection.
+   * @return 1 if the admin week selection was updated successfully, 0 otherwise.
+   * @throws SQLException If an SQL exception occurred.
+   */
   @Override public int updateAdminWeekSelection(
       UpdateAdminWeekSelectionRequest request) throws SQLException
   {
@@ -144,6 +165,12 @@ public class AdminWeekSelectionImpl implements AdminWeekSelectionDao
     return 1;
   }
 
+  /**
+   * Retrieves an admin week selection.
+   * @param request The request to retrieve an admin week selection.
+   * @return A list of admin week selections.
+   * @throws SQLException If an SQL exception occurred.
+   */
   @Override public List<AdminWeek> retrieveAdminWeekSelection(RetrieveAdminWeekSelectionRequest request) throws SQLException
   {
     List<AdminWeek> adminWeekSelections = new ArrayList<>();

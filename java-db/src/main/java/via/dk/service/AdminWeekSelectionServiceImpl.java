@@ -7,15 +7,26 @@ import via.dk.dao.adminWeekSelecrtion.AdminWeekSelectionImpl;
 
 import java.util.List;
 
+/**
+ * Service class for the AdminWeekSelectionService.
+ */
 public class AdminWeekSelectionServiceImpl extends AdminWeekSelectionServiceGrpc.AdminWeekSelectionServiceImplBase
 {
   private final AdminWeekSelectionDao adminWeekSelectionDao;
 
-  public AdminWeekSelectionServiceImpl()
+	/**
+	 * Constructor for the AdminWeekSelectionServiceImpl class.
+	 */
+	public AdminWeekSelectionServiceImpl()
   {
     this.adminWeekSelectionDao = new AdminWeekSelectionImpl();
   }
 
+	/**
+	 * Creates an admin week selection.
+	 * @param request The request to create an admin week selection.
+	 * @param responseObserver A response observer required by gRPC to send the response.
+	 */
   @Override
   public void createAdminWeekSelection(CreateAdminWeekSelectionRequest request,
       StreamObserver<CreateAdminSelectionResponse> responseObserver) {

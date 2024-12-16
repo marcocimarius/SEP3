@@ -4,6 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Static class for handling the database connection.
+ * A single connection is created and shared across the application.
+ * .env file is used to store the database credentials.
+ */
 public class DatabaseConnection {
 
 	private static Connection con = null;
@@ -26,6 +31,11 @@ public class DatabaseConnection {
 		}
 	}
 
+	/**
+	 * Get the connection object.
+	 *
+	 * @return Connection object
+	 */
 	public static Connection getConnection() {
 		return con;
 	}

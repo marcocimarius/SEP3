@@ -15,15 +15,27 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service class for the IngredientService. Based on the IngredientsServiceGrpc.IngredientsServiceImplBase class.
+ * Extends the Grpc-generated IngredientsServiceImplBase class.
+ */
 public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServiceImplBase
 {
   private final IIngredientsDao ingredientsDao;
 
+  /**
+   * Constructor for the IngredientServiceImp class.
+   */
   public IngredientServiceImp()
   {
     this.ingredientsDao = new IngredientsDaoImpl();
   }
 
+  /**
+   * Creates an ingredient.
+   * @param request The request to create an ingredient.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void createIngredient(CreateIngredientRequest request,
       StreamObserver<CreateIngredientResponse> responseObserver) {
@@ -66,6 +78,11 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
   }
 
 
+  /**
+   * Updates an ingredient.
+   * @param request The request to update an ingredient.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void updateIngredient(UpdateIngredientRequest request,
       StreamObserver<UpdateIngredientResponse> responseObserver) {
@@ -91,6 +108,11 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
     responseObserver.onCompleted();
   }
 
+	/**
+	 * Deletes an ingredient.
+	 * @param request The request to delete an ingredient.
+	 * @param responseObserver 		A response observer required by gRPC to send the response.
+	 */
   @Override
   public void deleteIngredient(DeleteIngredientRequest request,
       StreamObserver<DeleteIngredientResponse> responseObserver) {
@@ -111,6 +133,11 @@ public class IngredientServiceImp extends IngredientsServiceGrpc.IngredientsServ
     responseObserver.onCompleted();
   }
 
+	/**
+	 * Gets all ingredients.
+	 * @param request The request to get all ingredients.
+	 * @param responseObserver A response observer required by gRPC to send the response.
+	 */
   @Override
   public void getAllIngredients(GetAllIngredientsRequest request,
       StreamObserver<GetAllIngredientsResponse> responseObserver) {

@@ -13,6 +13,11 @@ public class SubscriptionDaoImpl implements SubscriptionDao
 {
   private final Connection db = DatabaseConnection.getConnection();
 
+  /** Method to create a new subscription.
+   * @param request The subscription object.
+   * @return 0 or -1 if the subscription was not created, 1 if the subscription was created.
+   * @throws SQLException
+   */
   @Override public int createSubscription(CreateSubscriptionRequest request) throws SQLException
   {
     try {
@@ -45,6 +50,11 @@ public class SubscriptionDaoImpl implements SubscriptionDao
     return 0;
   }
 
+  /** Method to cancel a subscription.
+   * @param request The subscription object.
+   * @return 0 or -1 if the subscription was not canceled, 1 if the subscription was canceled.
+   * @throws SQLException
+   */
   @Override public int cancelSubscription(CancelSubscriptionRequest request) throws SQLException
   {
     try {
@@ -73,6 +83,11 @@ public class SubscriptionDaoImpl implements SubscriptionDao
     return 0;
   }
 
+  /** Method to retrieve a subscription.
+   * @param request The subscription object.
+   * @return The subscription object.
+   * @throws SQLException
+   */
   @Override public RetrieveSubscriptionResponse retrieveSubscription(
       RetrieveSubscriptionRequest request) throws SQLException
   {

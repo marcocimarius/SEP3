@@ -1,5 +1,8 @@
 package via.dk.model.auth;
 
+/**
+ * Model class for the Login object.
+ */
 public class Login implements ILogin {
 	private String email;
 	private String password;
@@ -7,6 +10,11 @@ public class Login implements ILogin {
 	public Login() {
 	}
 
+	/**
+	 * Constructor for the Login class.
+	 * @param email The email of the user.
+	 * @param password The password of the user.
+	 */
 	public Login(String email, String password) {
 		this.email = email;
 		this.password = password;

@@ -1,5 +1,8 @@
 package via.dk.model.auth;
 
+/**
+ * Model class for the CustomerInformation object.
+ */
 public class CustomerInformation implements ICustomerInformation {
 	private int registrationId;
 	private String firstName;
@@ -23,6 +26,18 @@ public class CustomerInformation implements ICustomerInformation {
 		this.countryName = "";
 	}
 
+	/**
+	 * Constructor for the CustomerInformation class.
+	 * @param registrationId The registration id of the user.
+	 * @param firstName The first name of the user.
+	 * @param lastName The last name of the user.
+	 * @param phone The phone number of the user.
+	 * @param streetName The street name of the user.
+	 * @param streetNumber The street number of the user.
+	 * @param cityName The city name of the user.
+	 * @param postNumber The post number of the user.
+	 * @param countryName The country name of the user.
+	 */
 	public CustomerInformation(int registrationId, String firstName, String lastName, String phone, String streetName, String streetNumber, String cityName, String postNumber, String countryName) {
 		this.registrationId = registrationId;
 		this.firstName = firstName;

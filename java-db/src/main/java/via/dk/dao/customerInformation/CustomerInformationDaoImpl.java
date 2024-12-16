@@ -5,9 +5,18 @@ import via.dk.util.DatabaseConnection;
 
 import java.sql.*;
 
+/**
+ * Data access object for the CustomerInformation object.
+ */
 public class CustomerInformationDaoImpl implements ICustomerInformationDao {
 	Connection db = DatabaseConnection.getConnection();
 
+	/**
+	 * Method to create a new customer information.
+	 * @param ci The customer information object.
+	 * @return The number of rows affected.
+	 * @throws SQLException
+	 */
 	private int getCountryId(String name) throws SQLException{
 		PreparedStatement countrySelectStmt = db.prepareStatement("select * from country where name = ?");
 		countrySelectStmt.setString(1, name);
@@ -17,6 +26,12 @@ public class CustomerInformationDaoImpl implements ICustomerInformationDao {
 		}
 		return 0;
 	}
+	/**
+	 * Method to create a new customer information.
+	 * @param ci The customer information object.
+	 * @return The number of rows affected.
+	 * @throws SQLException
+	 */
 	private int getCityId(String name) throws SQLException{
 		PreparedStatement citySelectStmt = db.prepareStatement("select * from city where name = ?");
 		citySelectStmt.setString(1, name);
@@ -27,6 +42,12 @@ public class CustomerInformationDaoImpl implements ICustomerInformationDao {
 		return 0;
 	}
 
+	/**
+	 * Method to create a new customer information.
+	 * @param ci The customer information object.
+	 * @return The number of rows affected.
+	 * @throws SQLException
+	 */
 	private int getAddressId(String name) throws SQLException{
 		PreparedStatement addressSelectStmt = db.prepareStatement("select * from address where street_name = ?");
 		addressSelectStmt.setString(1, name);
@@ -37,6 +58,12 @@ public class CustomerInformationDaoImpl implements ICustomerInformationDao {
 		return 0;
 	}
 
+	/**
+	 * Method to create a new customer information.
+	 * @param ci The customer information object.
+	 * @return The number of rows affected.
+	 * @throws SQLException
+	 */
 	@Override
 	public int create(ICustomerInformation ci) throws SQLException{
 		int countryId = getCountryId(ci.getCountryName());

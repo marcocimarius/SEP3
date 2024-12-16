@@ -12,6 +12,12 @@ public class RecipeDaoImpl implements IRecipeDao
 {
   private final Connection db = DatabaseConnection.getConnection();
 
+	/**
+	 * Method to create a new recipe.
+	 * @param recipe The recipe object.
+	 * @return 0 or -1 if the recipe was not created, 1 if the recipe was created.
+	 * @throws SQLException
+	 */
   @Override public int create(CreateRecipeRequest recipe) throws SQLException
   {
     PreparedStatement statement = db.prepareStatement("""

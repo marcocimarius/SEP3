@@ -1,15 +1,22 @@
 package via.dk.util.dtos;
 
+/**
+ * Data transfer object for deleting an ingredient.
+ */
 public class DeleteIngredientDto
 {
   private int id;
 
-  public DeleteIngredientDto(int id)
+	/**
+	 * Constructor for the DeleteIngredientDto class.
+	 * @param id
+	 */
+	public DeleteIngredientDto(int id)
   {
     this.id = id;
   }
 
-  public int getId()
+	public int getId()
   {
     return id;
   }

@@ -8,14 +8,26 @@ import via.dk.dao.selection.SelectionDaoImpl;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Service class for the SelectionService. Based on the SelectionServiceGrpc.SelectionServiceImplBase class.
+ * Extends the Grpc-generated SelectionServiceImplBase class.
+ */
 public class SelectionServiceImpl extends SelectionServiceGrpc.SelectionServiceImplBase
 {
   private final SelectionDao selectionDao;
 
+  /**
+   * Constructor for the SelectionServiceImpl class.
+   */
   public SelectionServiceImpl() {
     this.selectionDao = new SelectionDaoImpl();
   }
 
+  /**
+   * Creates a selection.
+   * @param request The request to create a selection.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void createSelection(CreateSelectionRequest request,
     StreamObserver<CreateSelectionResponse> responseObserver) {
@@ -38,6 +50,11 @@ public class SelectionServiceImpl extends SelectionServiceGrpc.SelectionServiceI
     }
   }
 
+  /**
+   * Updates a selection.
+   * @param request The request to update a selection.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void updateSelection(UpdateSelectionRequest request,
       StreamObserver<UpdateSelectionResponse> responseObserver) {
@@ -60,6 +77,11 @@ public class SelectionServiceImpl extends SelectionServiceGrpc.SelectionServiceI
     }
   }
 
+  /**
+   * Deletes a selection.
+   * @param request The request to delete a selection.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void deleteSelection(DeleteSelectionRequest request,
       StreamObserver<DeleteSelectionResponse> responseObserver) {
@@ -82,6 +104,11 @@ public class SelectionServiceImpl extends SelectionServiceGrpc.SelectionServiceI
     }
   }
 
+  /**
+   * Retrieves a selection.
+   * @param request The request to retrieve a selection.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void retrieveSelection(RetrieveSelectionRequest request,
       StreamObserver<RetrieveSelectionResponse> responseObserver)

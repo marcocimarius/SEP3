@@ -9,14 +9,26 @@ import via.dk.util.TimeConverter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service class for the RecipeService. Based on the RecipeServiceGrpc.RecipeServiceImplBase class.
+ * Extends the Grpc-generated RecipeServiceImplBase class.
+ */
 public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
 {
   private final IRecipeDao recipeDao;
 
+  /**
+   * Constructor for the RecipeServiceImpl class.
+   */
   public RecipeServiceImpl() {
     this.recipeDao = new RecipeDaoImpl();
   }
 
+  /**
+   * Creates a recipe.
+   * @param request The request to create a recipe.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void createRecipe(CreateRecipeRequest request,
       StreamObserver<CreateRecipeResponse> responseObserver) {
@@ -41,6 +53,11 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
     }
   }
 
+  /**
+   * Retrieves a recipe.
+   * @param request The request to retrieve a recipe.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void getAllRecipes(RetrieveRecipeRequest request,
       StreamObserver<RetrieveRecipeResponse> responseObserver) {
@@ -81,6 +98,11 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
     responseObserver.onCompleted();
   }
 
+  /**
+   * Updates a recipe.
+   * @param request The request to update a recipe.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void updateRecipe(UpdateRecipeRequest request,
       StreamObserver<UpdateRecipeResponse> responseObserver) {
@@ -104,6 +126,11 @@ public class RecipeServiceImpl extends RecipeServiceGrpc.RecipeServiceImplBase
     }
   }
 
+  /**
+   * Deletes a recipe.
+   * @param request The request to delete a recipe.
+   * @param responseObserver A response observer required by gRPC to send the response.
+   */
   @Override
   public void deleteRecipe(DeleteRecipeRequest request,
       StreamObserver<DeleteRecipeResponse> responseObserver) {

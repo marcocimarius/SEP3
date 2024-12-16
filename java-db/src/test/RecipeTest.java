@@ -40,18 +40,23 @@ public class RecipeTest {
 	public void createRecipe() {
 		// Arrange
 		createIngredients();
+		List<IngredientModel> ingrs = null;
+		try {
+			ingredientDao.getAllIngredients();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// get the ids of the ingredients of name Test1 and Test2
+		List<Integer> ingIds = List.of(ingrs.stream().filter(i -> i.getName().equals("Test1")).findFirst().get().getId(),
+				ingrs.stream().filter(i -> i.getName().equals("Test2")).findFirst().get().getId());
+		CreateRecipeRequest recipe = CreateRecipeRequest.newBuilder()
+				.setName("Test recipe")
+				.addAllIngredientsId(ingIds)
+				.setDescription("Boil pasta and add tomato")
+				.setImageLink("https://www.google.com")
+				.build();
 		// Act
 		try {
-			List<IngredientModel> ingrs = ingredientDao.getAllIngredients();
-			// get the ids of the ingredients of name Test1 and Test2
-			List<Integer> ingIds = List.of(ingrs.stream().filter(i -> i.getName().equals("Test1")).findFirst().get().getId(),
-					ingrs.stream().filter(i -> i.getName().equals("Test2")).findFirst().get().getId());
-			CreateRecipeRequest recipe = CreateRecipeRequest.newBuilder()
-					.setName("Test recipe")
-					.addAllIngredientsId(ingIds)
-					.setDescription("Boil pasta and add tomato")
-					.setImageLink("https://www.google.com")
-					.build();
 			int status = recipeDao.create(recipe);
 			// find the created recipe by name
 			var createdRecipe = recipeDao.getAllRecipes().stream().filter(r -> r.getName().equals("Test recipe")).findFirst().orElse(null);
@@ -68,8 +73,6 @@ public class RecipeTest {
 	@AfterAll
 	public static void tearDown() {
 		try {
-//			org.postgresql.util.PSQLException: ERROR: update or delete on table "recipe" violates foreign key constraint "recipes_with_ingredients_recipe_id_fkey" on table "recipes_with_ingredients"
-//			Detail: Key (id)=(8) is still referenced from table "recipes_with_ingredients".
 			var recipe = recipeDao.getAllRecipes().stream().filter(r -> r.getName().equals("Test recipe")).findFirst().orElse(null);
 			List<IngredientModel> ingrs = ingredientDao.getAllIngredients();
 			List<Integer> ingIds = List.of(ingrs.stream().filter(i -> i.getName().equals("Test1")).findFirst().get().getId(),

@@ -9,9 +9,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Data access object for the Login object.
+ */
 public class LoginDaoImpl implements ILoginDao {
 	Connection db = DatabaseConnection.getConnection();
 
+	/**
+	 * Method to login a user.
+	 * @param login The login object.
+	 * @return The registration object.
+	 * @throws SQLException
+	 */
 	@Override
 	public Registration login(ILogin login) throws SQLException {
 		// insert into registration (username, password, isAdmin) values (registration.getUsername(), registration.getPassword(), registration.getIsAdmin());

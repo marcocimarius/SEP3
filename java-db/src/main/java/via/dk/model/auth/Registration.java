@@ -1,5 +1,8 @@
 package via.dk.model.auth;
 
+/**
+ * Model class for the Registration object.
+ */
 public class Registration implements IRegistration {
 	private Integer id;
 	private String email;
@@ -9,6 +12,12 @@ public class Registration implements IRegistration {
 	public Registration() {
 	}
 
+	/**
+	 * Constructor for the Registration class.
+	 * @param email The email of the user.
+	 * @param password The password of the user.
+	 * @param isAdmin Whether the user is an admin or not.
+	 */
 	public Registration(String email, String password, Boolean isAdmin) {
 		this.id = null;
 		this.email = email;
@@ -16,6 +25,13 @@ public class Registration implements IRegistration {
 		this.isAdmin = isAdmin;
 	}
 
+	/**
+	 * Constructor for the Registration class.
+	 * @param id The id of the user.
+	 * @param email The email of the user.
+	 * @param password The password of the user.
+	 * @param isAdmin Whether the user is an admin or not.
+	 */
 	public Registration(Integer id, String email, String password, Boolean isAdmin) {
 		this.id = id;
 		this.email = email;

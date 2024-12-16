@@ -2,6 +2,9 @@ package via.dk.model.ingredient;
 
 import java.sql.Timestamp;
 
+/**
+ * Model class for the IngredientModel object.
+ */
 public class IngredientModel
 {
   private Integer id;
@@ -12,6 +15,16 @@ public class IngredientModel
   private Timestamp modificationDate;
   private String type;
 
+	/**
+	 * Constructor for the IngredientModel class.
+	 * @param id The id of the ingredient.
+	 * @param name The name of the ingredient.
+	 * @param calories 		The calories of the ingredient.
+	 * @param isAllergen 	Whether the ingredient is an allergen or not.
+	 * @param creationDate 	The creation date of the ingredient.
+	 * @param modificationDate 	The modification date of the ingredient.
+	 * @param type  The type of the ingredient.
+	 */
   public IngredientModel(Integer id, String name, int calories, boolean isAllergen,
       Timestamp creationDate, Timestamp modificationDate, String type)
   {

@@ -12,6 +12,11 @@ public class SelectionDaoImpl implements SelectionDao
 {
   private final Connection db = DatabaseConnection.getConnection();
 
+  /** Method to create a new selection.
+   * @param request The selection object.
+   * @return 0 or -1 if the selection was not created, 1 if the selection was created.
+   * @throws SQLException
+   */
   @Override public int create(CreateSelectionRequest request)
       throws SQLException
   {
@@ -59,6 +64,11 @@ public class SelectionDaoImpl implements SelectionDao
     return 1;
   }
 
+  /** Method to update a selection.
+   * @param request The selection object.
+   * @return 0 or -1 if the selection was not updated, 1 if the selection was updated.
+   * @throws SQLException
+   */
   @Override public int update(UpdateSelectionRequest request)
       throws SQLException
   {
@@ -104,6 +114,11 @@ public class SelectionDaoImpl implements SelectionDao
     return 1;
   }
 
+  /** Method to delete a selection.
+   * @param request The selection object.
+   * @return 0 if the selection was not deleted, 1 if the selection was deleted.
+   * @throws SQLException
+   */
   @Override public int delete(DeleteSelectionRequest request)
       throws SQLException
   {
@@ -138,6 +153,11 @@ public class SelectionDaoImpl implements SelectionDao
     return 0;
   }
 
+  /** Method to retrieve a selection.
+   * @param request The selection object.
+   * @return A list of recipes.
+   * @throws SQLException
+   */
   @Override public List<Recipe> retrieve(RetrieveSelectionRequest request)
       throws SQLException
   {
